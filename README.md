@@ -56,15 +56,35 @@ python app.py
 
 Then open <http://127.0.0.1:5000> in your browser.
 
+### Run without an API key (demo mode)
+
+No OpenAI key or credits? Run the app in free offline **demo mode**, which serves
+realistic canned recommendations with no API calls:
+
+```bash
+DEMO_MODE=1 python app.py
+```
+
+(or set `DEMO_MODE=1` in your `.env`). Great for exploring the UI or presenting
+the app. Switch back to real recommendations by removing it / setting `DEMO_MODE=0`.
+
 ## Configuration
 
 Set these in your `.env` file (see `.env.example`):
 
-| Variable            | Required | Default        | Description                              |
-| ------------------- | -------- | -------------- | ---------------------------------------- |
-| `OPENAI_API_KEY`    | yes      | –              | Your OpenAI API key.                     |
-| `OPENAI_MODEL`      | no       | `gpt-4o-mini`  | Chat model used for recommendations.     |
-| `FLASK_SECRET_KEY`  | no       | dev fallback   | Secret used to sign session cookies.     |
+| Variable            | Required | Default        | Description                                            |
+| ------------------- | -------- | -------------- | ------------------------------------------------------ |
+| `OPENAI_API_KEY`    | yes\*    | –              | Your OpenAI API key (\*not needed in demo mode).       |
+| `DEMO_MODE`         | no       | `0`            | Set to `1` to run free offline demo mode (no API key). |
+| `OPENAI_MODEL`      | no       | `gpt-4o-mini`  | Chat model used for recommendations.                   |
+| `FLASK_SECRET_KEY`  | no       | dev fallback   | Secret used to sign session cookies.                   |
+
+## Troubleshooting
+
+**`OpenAI API error: Error code: 429 ... insufficient_quota`** — your API key is
+valid but the account has no credits. Add a balance at
+[platform.openai.com/settings/organization/billing](https://platform.openai.com/settings/organization/billing/overview),
+or run in demo mode (`DEMO_MODE=1`) to try the app for free.
 
 ## Project structure
 
@@ -80,6 +100,7 @@ AI-MajorRecommendation/
 │   └── js/app.js
 └── src/
     ├── recommender.py         # Recommendation engine: one JSON call per turn
+    ├── demo.py                # Offline demo engine (used when DEMO_MODE=1)
     └── utils.py               # OpenAI client + shared config
 ```
 
