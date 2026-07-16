@@ -54,7 +54,7 @@ COMMON_MAJORS = [
 ]
 
 # Default chat model; overridable via the GEMINI_MODEL environment variable.
-DEFAULT_MODEL = "gemini-2.5-flash"
+DEFAULT_MODEL = "gemini-3.5-flash"
 
 # Cache the client so we do not rebuild it on every request.
 _client = None

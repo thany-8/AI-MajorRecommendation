@@ -77,7 +77,7 @@ Set these in your `.env` file (see `.env.example`):
 | `GEMINI_API_KEY`     | yes\* | –                  | Your free Gemini API key (\*not needed in demo mode).          |
 | `DEMO_MODE`          | no    | `0`                | Set to `1` to run free offline demo mode (no API key).         |
 | `AUTO_DEMO_FALLBACK` | no    | `1`                | Auto-switch to demo mode if Gemini is rate-limited/over quota. |
-| `GEMINI_MODEL`       | no    | `gemini-2.5-flash` | Gemini model used for recommendations.                         |
+| `GEMINI_MODEL`       | no    | `gemini-3.5-flash` | Gemini model used for recommendations.                         |
 | `FLASK_SECRET_KEY`   | no    | dev fallback       | Secret used to sign session cookies.                           |
 
 ## Troubleshooting
