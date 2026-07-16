@@ -1,15 +1,15 @@
 # src/utils.py
-"""Shared configuration and OpenAI client helpers.
+"""Shared configuration and Google Gemini client helpers.
 
 This module centralises everything the rest of the app needs to talk to the
-OpenAI API: loading the ``.env`` file, building the (modern v1/v2) client, and
-exposing the trait categories and the seed list of majors.
+Gemini API: loading the ``.env`` file, building the client, and exposing the
+trait categories and the seed list of majors.
 """
 
 import os
 
 from dotenv import load_dotenv
-from openai import OpenAI
+from google import genai
 
 # Load variables from a local .env file (if present) into the environment.
 load_dotenv()
@@ -18,8 +18,16 @@ load_dotenv()
 class RecommenderError(RuntimeError):
     """Raised when the recommendation engine cannot complete a request.
 
-    Used for user-facing failures such as a missing API key, an OpenAI API
+    Used for user-facing failures such as a missing API key, a Gemini API
     error, or an unparseable model response.
+    """
+
+
+class CapacityError(RecommenderError):
+    """Raised when the Gemini API is rate-limited or out of quota.
+
+    Kept distinct from other errors so the app can automatically fall back to
+    demo mode (see AUTO_DEMO_FALLBACK) when this specific condition occurs.
     """
 
 
@@ -45,31 +53,37 @@ COMMON_MAJORS = [
     "Medicine (Pre-Med)",
 ]
 
-# Default chat model; overridable via the OPENAI_MODEL environment variable.
-DEFAULT_MODEL = "gpt-4o-mini"
+# Default chat model; overridable via the GEMINI_MODEL environment variable.
+DEFAULT_MODEL = "gemini-2.5-flash"
 
 # Cache the client so we do not rebuild it on every request.
 _client = None
 
 
+def get_api_key():
+    """Return the configured Gemini API key (GEMINI_API_KEY or GOOGLE_API_KEY)."""
+    return os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+
+
 def get_client():
-    """Return a cached OpenAI client, creating it on first use.
+    """Return a cached Gemini client, creating it on first use.
 
     Raises:
-        RecommenderError: If ``OPENAI_API_KEY`` is not configured.
+        RecommenderError: If no Gemini API key is configured.
     """
     global _client
-    api_key = os.getenv("OPENAI_API_KEY")
+    api_key = get_api_key()
     if not api_key:
         raise RecommenderError(
-            "OPENAI_API_KEY is not set. Copy .env.example to .env and add your "
-            "OpenAI API key."
+            "GEMINI_API_KEY is not set. Get a free key at "
+            "https://aistudio.google.com/apikey, then copy .env.example to .env "
+            "and add it (or set DEMO_MODE=1 to run without a key)."
         )
     if _client is None:
-        _client = OpenAI(api_key=api_key)
+        _client = genai.Client(api_key=api_key)
     return _client
 
 
 def get_model():
-    """Return the configured OpenAI chat model name."""
-    return os.getenv("OPENAI_MODEL", DEFAULT_MODEL)
+    """Return the configured Gemini model name."""
+    return os.getenv("GEMINI_MODEL", DEFAULT_MODEL)

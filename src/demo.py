@@ -1,7 +1,7 @@
 """Offline demo engine, used when ``DEMO_MODE`` is enabled.
 
 Produces realistic, deterministic major recommendations from simple keyword
-matching, so the app runs with **no OpenAI key and no cost**. It is not a
+matching, so the app runs with **no API key and no cost**. It is not a
 replacement for the real AI advisor — just enough to explore the UI or present
 the app. ``recommender.start_session``/``refine_session`` delegate here when
 demo mode is on, so the rest of the app is unchanged.
@@ -187,7 +187,7 @@ def start(form: dict, profile_text: str) -> tuple[dict, list]:
         "message": (
             f"Thanks! I can already see strong matches like {top}. "
             "Let's refine them with a few quick questions. "
-            "(Demo mode \u2014 no OpenAI credits are being used.)"
+            "(Demo mode \u2014 no API calls are being made.)"
         ),
         "question": QUESTIONS[0],
     }

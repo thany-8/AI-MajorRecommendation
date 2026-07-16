@@ -1,4 +1,4 @@
-"""Core recommendation engine backed by the OpenAI Chat Completions API.
+"""Core recommendation engine backed by the Google Gemini API.
 
 The web app drives the whole experience through two entry points:
 
@@ -9,7 +9,7 @@ The web app drives the whole experience through two entry points:
   latest answer and returns updated scores, recommendations, a message, and the
   next follow-up question (or an empty question when enough is known).
 
-Each turn is a single OpenAI call that returns strict JSON, so there is no
+Each turn is a single Gemini call that returns strict JSON, so there is no
 fragile string parsing and no use of ``eval`` (unlike the original skeleton).
 """
 
@@ -18,12 +18,13 @@ from __future__ import annotations
 import json
 import os
 
-from openai import OpenAIError
+from google.genai import errors as genai_errors, types
 
 from . import demo as _demo
 from .utils import (
     CATEGORIES,
     COMMON_MAJORS,
+    CapacityError,
     RecommenderError,
     get_client,
     get_model,
@@ -48,21 +49,27 @@ def _auto_demo_fallback_enabled() -> bool:
     )
 
 
-def _is_capacity_error(exc: OpenAIError) -> bool:
-    """Return True when OpenAI failed due to quota/rate/billing limits."""
+def _is_capacity_error(exc: Exception) -> bool:
+    """Return True when Gemini failed due to quota/rate/capacity limits."""
     text = str(exc).lower()
     tokens = (
-        "insufficient_quota",
-        "exceeded your current quota",
+        "resource_exhausted",
         "rate limit",
-        "billing",
+        "quota",
+        "exhausted",
+        "unavailable",
+        "overloaded",
         "429",
+        "503",
     )
-    return any(token in text for token in tokens)
+    if any(token in text for token in tokens):
+        return True
+    code = getattr(exc, "code", None) or getattr(exc, "status_code", None)
+    return code in (429, 503)
 
 
 def _seed_demo_from_messages(messages: list[dict]) -> list[dict]:
-    """Create demo-mode state from the existing OpenAI conversation."""
+    """Create demo-mode state from the existing conversation."""
     user_parts = []
     for msg in messages:
         if msg.get("role") == "user" and isinstance(msg.get("content"), str):
@@ -103,30 +110,54 @@ Rules:
 """.strip()
 
 
+def _to_gemini(messages: list[dict]) -> tuple[str | None, list]:
+    """Convert role/content messages into a Gemini system instruction + contents."""
+    system_parts = []
+    contents = []
+    for msg in messages:
+        role = msg.get("role")
+        text = msg.get("content", "")
+        if role == "system":
+            if text:
+                system_parts.append(text)
+        else:
+            gemini_role = "model" if role in ("assistant", "model") else "user"
+            contents.append(
+                types.Content(role=gemini_role, parts=[types.Part.from_text(text=text)])
+            )
+    system_instruction = "\n\n".join(system_parts) if system_parts else None
+    return system_instruction, contents
+
+
 def _chat_json(messages: list[dict]) -> dict:
-    """Call the model and return the parsed JSON object.
+    """Call Gemini and return the parsed JSON object.
 
     Raises:
-        RecommenderError: On API errors or if the response is not valid JSON.
+        CapacityError: When the API is rate-limited or out of quota.
+        RecommenderError: On other API errors or an unparseable response.
     """
     client = get_client()
+    system_instruction, contents = _to_gemini(messages)
     try:
-        response = client.chat.completions.create(
+        response = client.models.generate_content(
             model=get_model(),
-            messages=messages,
-            response_format={"type": "json_object"},
-            temperature=0.7,
+            contents=contents,
+            config=types.GenerateContentConfig(
+                system_instruction=system_instruction,
+                response_mime_type="application/json",
+                temperature=0.7,
+            ),
         )
-    except OpenAIError as exc:  # network, auth, rate-limit, etc.
+    except genai_errors.APIError as exc:
         if _is_capacity_error(exc):
-            raise RecommenderError(
-                "Your OpenAI account has no available quota/credits. Add a balance "
-                "at https://platform.openai.com/settings/organization/billing, or "
-                "set DEMO_MODE=1 in your .env to run the app for free without a key."
+            raise CapacityError(
+                "The Gemini API is rate-limited or out of quota right now. Wait a "
+                "moment and try again, get a free key at "
+                "https://aistudio.google.com/apikey, or set DEMO_MODE=1 to run offline."
             ) from exc
-        raise RecommenderError(f"OpenAI API error: {exc}") from exc
+        raise RecommenderError(f"Gemini API error: {exc}") from exc
 
-    content = (response.choices[0].message.content or "").strip()
+    content = (response.text or "").strip()
     try:
         return json.loads(content)
     except json.JSONDecodeError as exc:
@@ -194,7 +225,7 @@ def start_session(form: dict) -> tuple[dict, list[dict]]:
 
     Returns:
         A tuple of (result, messages) where ``result`` is the normalised payload
-        for the UI and ``messages`` is the running OpenAI conversation to persist.
+        for the UI and ``messages`` is the running conversation to persist.
     """
     profile = build_profile_summary(form)
     if _demo_enabled():
@@ -213,12 +244,12 @@ def start_session(form: dict) -> tuple[dict, list[dict]]:
     ]
     try:
         data = _chat_json(messages)
-    except RecommenderError as exc:
-        if _auto_demo_fallback_enabled() and "quota/credits" in str(exc).lower():
+    except CapacityError:
+        if _auto_demo_fallback_enabled():
             data, messages = _demo.start(form, profile)
             data["message"] = (
-                "OpenAI credits are currently unavailable, so I switched to free "
-                "demo mode for now. " + data.get("message", "")
+                "The Gemini API is unavailable right now, so I switched to free "
+                "demo mode for this session. " + data.get("message", "")
             ).strip()
             return _normalise(data), messages
         raise
@@ -234,7 +265,7 @@ def refine_session(
     """Continue a session with the student's latest answer.
 
     Args:
-        messages: The persisted OpenAI conversation from the previous turn.
+        messages: The persisted conversation from the previous turn.
         answer: The student's free-text answer to the last follow-up question.
         questions_asked: How many follow-up questions have been asked so far.
 
@@ -262,23 +293,23 @@ def refine_session(
     messages = messages + [{"role": "user", "content": instruction}]
     try:
         data = _chat_json(messages)
-    except RecommenderError as exc:
-        if _auto_demo_fallback_enabled() and "quota/credits" in str(exc).lower():
-            demo_messages = (
-                messages if messages and messages[0].get("role") == "demo" else _seed_demo_from_messages(messages)
-            )
-            data, messages = _demo.refine(
-                demo_messages,
-                answer,
-                questions_asked,
-                MAX_QUESTIONS,
-            )
-            data["message"] = (
-                "OpenAI credits are currently unavailable, so I switched to free "
-                "demo mode for now. " + data.get("message", "")
-            ).strip()
-        else:
+    except CapacityError:
+        if not _auto_demo_fallback_enabled():
             raise
+        demo_messages = (
+            messages if messages and messages[0].get("role") == "demo"
+            else _seed_demo_from_messages(messages)
+        )
+        data, messages = _demo.refine(
+            demo_messages,
+            answer,
+            questions_asked,
+            MAX_QUESTIONS,
+        )
+        data["message"] = (
+            "The Gemini API is unavailable right now, so I switched to free "
+            "demo mode for this session. " + data.get("message", "")
+        ).strip()
 
     result = _normalise(data)
     if finalize:

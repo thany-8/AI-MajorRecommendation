@@ -25,7 +25,7 @@ app.secret_key = os.getenv("FLASK_SECRET_KEY", "dev-secret-change-me")
 
 # Server-side conversation store: session id -> {messages, questions_asked}.
 # An in-memory dict is sufficient for a single-process app and keeps the large
-# OpenAI message history out of the (4 KB) signed session cookie.
+# conversation history out of the (4 KB) signed session cookie.
 _SESSIONS: dict[str, dict] = {}
 
 
