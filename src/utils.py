@@ -18,6 +18,14 @@ def initialize_openai():
     if not openai.api_key:
         raise ValueError("OpenAI API key not found. Please check your .env file.")
 
+
+def ask_question(question):
+    """
+    Ask the user a question and return their response stripped of leading/trailing whitespace.
+    """
+    print(question)
+    return input("> ").strip()
+
 # List of majors
 majors = ["Computer Science", "Psychology", "Business Administration"]
 
