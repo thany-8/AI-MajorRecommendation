@@ -16,9 +16,11 @@ fragile string parsing and no use of ``eval`` (unlike the original skeleton).
 from __future__ import annotations
 
 import json
+import os
 
 from openai import OpenAIError
 
+from . import demo as _demo
 from .utils import (
     CATEGORIES,
     COMMON_MAJORS,
@@ -29,6 +31,11 @@ from .utils import (
 
 # How many refining follow-up questions to ask before finalising.
 MAX_QUESTIONS = 6
+
+
+def _demo_enabled() -> bool:
+    """Return True when offline demo mode is switched on via DEMO_MODE."""
+    return os.getenv("DEMO_MODE", "").strip().lower() in ("1", "true", "yes", "on")
 
 _SYSTEM_PROMPT = f"""
 You are a warm, encouraging university academic advisor. You help students
@@ -77,6 +84,13 @@ def _chat_json(messages: list[dict]) -> dict:
             temperature=0.7,
         )
     except OpenAIError as exc:  # network, auth, rate-limit, etc.
+        text = str(exc)
+        if "insufficient_quota" in text or "exceeded your current quota" in text:
+            raise RecommenderError(
+                "Your OpenAI account has no available quota/credits. Add a balance "
+                "at https://platform.openai.com/settings/organization/billing, or "
+                "set DEMO_MODE=1 in your .env to run the app for free without a key."
+            ) from exc
         raise RecommenderError(f"OpenAI API error: {exc}") from exc
 
     content = (response.choices[0].message.content or "").strip()
@@ -150,6 +164,9 @@ def start_session(form: dict) -> tuple[dict, list[dict]]:
         for the UI and ``messages`` is the running OpenAI conversation to persist.
     """
     profile = build_profile_summary(form)
+    if _demo_enabled():
+        data, messages = _demo.start(form, profile)
+        return _normalise(data), messages
     user_prompt = (
         f"{profile}\n\n"
         "Assess this student now. Provide their trait scores, 4-6 major "
@@ -180,6 +197,10 @@ def refine_session(
     Returns:
         A tuple of (result, messages) with the updated payload and conversation.
     """
+    if _demo_enabled():
+        data, messages = _demo.refine(messages, answer, questions_asked, MAX_QUESTIONS)
+        return _normalise(data), messages
+
     finalize = questions_asked + 1 >= MAX_QUESTIONS
     instruction = (
         f'The student answered: "{answer.strip()}"\n\n'
