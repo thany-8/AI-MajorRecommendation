@@ -37,6 +37,40 @@ def _demo_enabled() -> bool:
     """Return True when offline demo mode is switched on via DEMO_MODE."""
     return os.getenv("DEMO_MODE", "").strip().lower() in ("1", "true", "yes", "on")
 
+
+def _auto_demo_fallback_enabled() -> bool:
+    """Return True when API-limit fallback to demo mode is enabled."""
+    return os.getenv("AUTO_DEMO_FALLBACK", "1").strip().lower() in (
+        "1",
+        "true",
+        "yes",
+        "on",
+    )
+
+
+def _is_capacity_error(exc: OpenAIError) -> bool:
+    """Return True when OpenAI failed due to quota/rate/billing limits."""
+    text = str(exc).lower()
+    tokens = (
+        "insufficient_quota",
+        "exceeded your current quota",
+        "rate limit",
+        "billing",
+        "429",
+    )
+    return any(token in text for token in tokens)
+
+
+def _seed_demo_from_messages(messages: list[dict]) -> list[dict]:
+    """Create demo-mode state from the existing OpenAI conversation."""
+    user_parts = []
+    for msg in messages:
+        if msg.get("role") == "user" and isinstance(msg.get("content"), str):
+            user_parts.append(msg["content"])
+    profile_text = "\n".join(user_parts).strip() or "The student did not provide many details yet."
+    _, demo_messages = _demo.start({}, profile_text)
+    return demo_messages
+
 _SYSTEM_PROMPT = f"""
 You are a warm, encouraging university academic advisor. You help students
 discover which university MAJORS (academic programs) best fit their interests,
@@ -84,8 +118,7 @@ def _chat_json(messages: list[dict]) -> dict:
             temperature=0.7,
         )
     except OpenAIError as exc:  # network, auth, rate-limit, etc.
-        text = str(exc)
-        if "insufficient_quota" in text or "exceeded your current quota" in text:
+        if _is_capacity_error(exc):
             raise RecommenderError(
                 "Your OpenAI account has no available quota/credits. Add a balance "
                 "at https://platform.openai.com/settings/organization/billing, or "
@@ -178,7 +211,18 @@ def start_session(form: dict) -> tuple[dict, list[dict]]:
         {"role": "system", "content": _SYSTEM_PROMPT},
         {"role": "user", "content": user_prompt},
     ]
-    data = _chat_json(messages)
+    try:
+        data = _chat_json(messages)
+    except RecommenderError as exc:
+        if _auto_demo_fallback_enabled() and "quota/credits" in str(exc).lower():
+            data, messages = _demo.start(form, profile)
+            data["message"] = (
+                "OpenAI credits are currently unavailable, so I switched to free "
+                "demo mode for now. " + data.get("message", "")
+            ).strip()
+            return _normalise(data), messages
+        raise
+
     result = _normalise(data)
     messages.append({"role": "assistant", "content": json.dumps(data)})
     return result, messages
@@ -197,7 +241,7 @@ def refine_session(
     Returns:
         A tuple of (result, messages) with the updated payload and conversation.
     """
-    if _demo_enabled():
+    if _demo_enabled() or (messages and messages[0].get("role") == "demo"):
         data, messages = _demo.refine(messages, answer, questions_asked, MAX_QUESTIONS)
         return _normalise(data), messages
 
@@ -216,7 +260,26 @@ def refine_session(
         instruction += "Then ask the single best next follow-up question."
 
     messages = messages + [{"role": "user", "content": instruction}]
-    data = _chat_json(messages)
+    try:
+        data = _chat_json(messages)
+    except RecommenderError as exc:
+        if _auto_demo_fallback_enabled() and "quota/credits" in str(exc).lower():
+            demo_messages = (
+                messages if messages and messages[0].get("role") == "demo" else _seed_demo_from_messages(messages)
+            )
+            data, messages = _demo.refine(
+                demo_messages,
+                answer,
+                questions_asked,
+                MAX_QUESTIONS,
+            )
+            data["message"] = (
+                "OpenAI credits are currently unavailable, so I switched to free "
+                "demo mode for now. " + data.get("message", "")
+            ).strip()
+        else:
+            raise
+
     result = _normalise(data)
     if finalize:
         result["question"] = ""
