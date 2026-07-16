@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MajorMatch · Find the university major you'll love</title>
+  <meta name="description" content="An AI advisor that recommends university majors based on your interests, hobbies and strengths.">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body data-max-questions="{{ max_questions }}">
+  <header class="site-header">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">🎓</span>
+      <span class="brand-name">Major<span class="accent">Match</span></span>
+    </div>
+    <p class="tagline">Discover the university major that fits who you are.</p>
+  </header>
+
+  <main class="container">
+    <!-- STEP 1 · Profile form -->
+    <section id="intro" class="panel intro">
+      <h1 class="intro-title">Find a major you'll love</h1>
+      <p class="intro-sub">
+        Tell us about your interests, hobbies and strengths. Our AI advisor will
+        suggest majors, then ask a few quick questions to refine them.
+      </p>
+
+      <form id="profile-form" class="profile-form" novalidate>
+        <div class="field">
+          <label for="interests">What genuinely interests you? <span class="req">*</span></label>
+          <textarea id="interests" name="interests" rows="2"
+            placeholder="e.g. building apps, understanding people, space, video games, helping others"></textarea>
+        </div>
+
+        <div class="field">
+          <label for="hobbies">What are your hobbies?</label>
+          <textarea id="hobbies" name="hobbies" rows="2"
+            placeholder="e.g. drawing, chess, football, coding, reading, music"></textarea>
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <label for="subjects">Favorite school subjects</label>
+            <input id="subjects" name="subjects" type="text"
+              placeholder="e.g. math, biology, art">
+          </div>
+          <div class="field">
+            <label for="strengths">Your strengths</label>
+            <input id="strengths" name="strengths" type="text"
+              placeholder="e.g. problem-solving, creativity, communication">
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <label for="work_style">How do you like to work?</label>
+            <select id="work_style" name="work_style">
+              <option value="">No preference</option>
+              <option>With people and teams</option>
+              <option>With data, logic and numbers</option>
+              <option>Creating and designing things</option>
+              <option>Building or fixing hands-on things</option>
+              <option>Leading and organizing</option>
+              <option>Independently, on my own</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="goals">Dream job or goal</label>
+            <input id="goals" name="goals" type="text"
+              placeholder="e.g. start a company, help patients, make games">
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="dislikes">Anything you'd like to avoid?</label>
+          <input id="dislikes" name="dislikes" type="text"
+            placeholder="e.g. lots of writing, memorizing, public speaking">
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg" id="start-btn">
+          <span class="btn-label">✨ Find my majors</span>
+        </button>
+      </form>
+    </section>
+
+    <!-- STEP 2 + 3 · Results and chat -->
+    <section id="workspace" class="workspace hidden">
+      <div class="results-col">
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Your major matches</h2>
+            <button id="restart-btn" class="btn btn-ghost btn-sm" type="button">Start over</button>
+          </div>
+          <div id="recommendations" class="recommendations"></div>
+        </div>
+
+        <div class="panel">
+          <h3 class="traits-title">Your profile snapshot</h3>
+          <div id="traits" class="traits"></div>
+        </div>
+      </div>
+
+      <div class="chat-col panel">
+        <div class="panel-head">
+          <h2>Refine with your advisor</h2>
+          <span id="progress" class="progress-badge"></span>
+        </div>
+        <div id="chat" class="chat" aria-live="polite"></div>
+
+        <form id="chat-form" class="chat-form">
+          <input id="chat-input" type="text" placeholder="Type your answer…" autocomplete="off">
+          <button type="submit" class="btn btn-primary" id="send-btn">Send</button>
+        </form>
+
+        <p id="done-note" class="done-note hidden">
+          ✅ All done! These are your final recommendations. Start over anytime to explore again.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Powered by OpenAI · Recommendations are guidance, not a guarantee.</p>
+  </footer>
+
+  <div id="toast" class="toast hidden" role="alert"></div>
+
+  <div id="loader" class="loader-overlay hidden">
+    <div class="spinner" aria-hidden="true"></div>
+    <p id="loader-text">Thinking…</p>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
