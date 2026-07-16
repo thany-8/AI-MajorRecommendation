@@ -64,29 +64,50 @@ For local testing without an API key, the app can run in offline demo mode:
 
 ```bash
 DEMO_MODE=1 python app.py
+```
+
+You can also add this setting to your local `.env` file:
+
+```env
+DEMO_MODE=1
+```
+
+To use live Gemini recommendations again, remove the variable or set:
+
+```env
+DEMO_MODE=0
+```
+
+Demo mode uses predefined sample recommendations and does not make API calls.
 
 ## Configuration
 
-Set these in your `.env` file (see `.env.example`):
+Set these variables in your `.env` file. See `.env.example` for placeholders.
 
-| Variable            | Required | Default        | Description                                            |
-| ------------------- | -------- | -------------- | ------------------------------------------------------ |
-| `GEMINI_API_KEY`     | yes\* | –                  | Your free Gemini API key (\*not needed in demo mode).          |
-| `DEMO_MODE`          | no    | `0`                | Set to `1` to run free offline demo mode (no API key).         |
-| `AUTO_DEMO_FALLBACK` | no    | `1`                | Auto-switch to demo mode if Gemini is rate-limited/over quota. |
-| `GEMINI_MODEL`       | no    | `gemini-3.5-flash` | Gemini model used for recommendations.                         |
-| `FLASK_SECRET_KEY`   | no    | dev fallback       | Secret used to sign session cookies.                           |
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `GEMINI_API_KEY` | Yes for live mode | None | Gemini API key used for live recommendations |
+| `DEMO_MODE` | No | `0` | Set to `1` to force offline demo mode |
+| `AUTO_DEMO_FALLBACK` | No | `1` | Automatically use demo mode when the Gemini API is unavailable |
+| `GEMINI_MODEL` | No | Your configured model | Gemini model used by the app |
+| `FLASK_SECRET_KEY` | Yes in production | Development fallback | Secret used to protect Flask sessions |
+
+> Never place your real API key or Flask secret in the README or `.env.example`.
 
 ## Troubleshooting
 
-**`Gemini API error ... RESOURCE_EXHAUSTED` (429)** — you've hit the free-tier
-rate limit or daily quota. Wait a minute and retry, check your limits at
-[aistudio.google.com](https://aistudio.google.com/apikey), or rely on the
-built-in demo fallback (`AUTO_DEMO_FALLBACK=1`, on by default) that serves free
-demo results automatically. You can also force demo mode with `DEMO_MODE=1`.
+### Gemini API error: `RESOURCE_EXHAUSTED` or `429`
 
-## Project structure
+This usually means the Gemini free-tier rate limit or daily quota was reached.
 
+You can:
+
+- Wait and try again later.
+- Review your Gemini API usage limits.
+- Let the app use its automatic demo fallback.
+- Force demo mode locally with `DEMO_MODE=1`.
+
+When `AUTO_DEMO_FALLBACK=1`, the app automatically serves sample recommendations if the Gemini API is temporarily unavailable.
 ```
 AI-MajorRecommendation/
 ├── app.py                     # Flask web server (routes + session state)
