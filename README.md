@@ -7,6 +7,14 @@ through a short chat-style Q&A with an AI advisor.
 
 Powered by the OpenAI API.
 
+## Demo
+
+![MajorMatch demo — filling the profile form, seeing ranked major matches, and refining them by chat](docs/demo.gif)
+
+*A student describes their interests and hobbies, gets ranked major matches with
+fit percentages, then refines the results by answering a few follow-up questions
+from the AI advisor.*
+
 ## Features
 
 - 🎨 **Visual web interface** – a profile form, ranked major cards with match
