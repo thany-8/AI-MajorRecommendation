@@ -15,7 +15,6 @@ Powered by the OpenAI API.
   hobbies, favourite subjects and strengths (not limited to a fixed list).
 - 💬 **Refine with follow-up questions** – the advisor asks a few targeted
   questions and updates the recommendations live.
-- 🖥️ **Command-line mode** – a simple 10-question CLI quiz is also included.
 
 ## Requirements
 
@@ -49,12 +48,6 @@ python app.py
 
 Then open <http://127.0.0.1:5000> in your browser.
 
-## Run the command-line version
-
-```bash
-python -m src.main
-```
-
 ## Configuration
 
 Set these in your `.env` file (see `.env.example`):
@@ -78,11 +71,8 @@ AI-MajorRecommendation/
 │   ├── css/style.css
 │   └── js/app.js
 └── src/
-    ├── recommender.py         # Web engine: one JSON call per turn
-    ├── question_generator.py  # CLI: generate a quiz question
-    ├── response_analyzer.py   # CLI: update trait scores from an answer
-    ├── utils.py               # OpenAI client + shared config
-    └── main.py                # CLI entry point
+    ├── recommender.py         # Recommendation engine: one JSON call per turn
+    └── utils.py               # OpenAI client + shared config
 ```
 
 ## How it works

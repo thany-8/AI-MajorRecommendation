@@ -73,9 +73,3 @@ def get_client():
 def get_model():
     """Return the configured OpenAI chat model name."""
     return os.getenv("OPENAI_MODEL", DEFAULT_MODEL)
-
-
-def ask_question(question):
-    """Ask the user a question on the CLI and return their trimmed response."""
-    print(question)
-    return input("> ").strip()
