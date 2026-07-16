@@ -56,17 +56,14 @@ python app.py
 
 Then open <https://ai-majorrecommendation.onrender.com/> in your browser.
 
-### Run without an API key (demo mode)
+## Demo Mode
 
-No API key yet? Run the app in free offline **demo mode**, which serves
-realistic canned recommendations with no API calls:
+The deployed version uses the Gemini API for real recommendations.
+
+For local testing without an API key, the app can run in offline demo mode:
 
 ```bash
 DEMO_MODE=1 python app.py
-```
-
-(or set `DEMO_MODE=1` in your `.env`). Great for exploring the UI or presenting
-the app. Switch back to real recommendations by removing it / setting `DEMO_MODE=0`.
 
 ## Configuration
 
