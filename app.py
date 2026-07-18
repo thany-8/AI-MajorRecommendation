@@ -21,11 +21,16 @@ from src.utils import RecommenderError
 load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = os.getenv("FLASK_SECRET_KEY", "dev-secret-change-me")
+app.secret_key = os.getenv("FLASK_SECRET_KEY")
+
+if not app.secret_key:
+    raise RuntimeError(
+        "FLASK_SECRET_KEY is missing. Add it to your .env file."
+    )
 
 # Server-side conversation store: session id -> {messages, questions_asked}.
 # An in-memory dict is sufficient for a single-process app and keeps the large
-# conversation history out of the (4 KB) signed session cookie.
+# OpenAI message history out of the (4 KB) signed session cookie.
 _SESSIONS: dict[str, dict] = {}
 
 
@@ -35,7 +40,7 @@ def index():
     return render_template("index.html", max_questions=MAX_QUESTIONS)
 
 
-@app.post("/api/start")
+@app.post("/api/start") 
 def api_start():
     """Start a new recommendation session from the submitted profile form."""
     form = request.get_json(silent=True) or {}
