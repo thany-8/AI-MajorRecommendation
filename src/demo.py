@@ -169,7 +169,10 @@ def _rank_majors(scores: dict, text: str) -> list:
         match = int(round(93 * raw / raw_max)) if raw_max else 70
         match = max(58, min(96, match))
         if matched:
-            why = f"Your mention of \u201c{matched[0]}\u201d fits {name} \u2014 it's about {spec['blurb']}"
+            why = (
+                f"Your mention of \u201c{matched[0]}\u201d fits {name} "
+                f"\u2014 it's about {spec['blurb']}"
+            )
         else:
             why = f"A strong overall fit \u2014 {name} is about {spec['blurb']}"
         recommendations.append({"name": name, "match": match, "why": why})
@@ -196,7 +199,9 @@ def start(form: dict, profile_text: str) -> tuple[dict, list]:
     return data, messages
 
 
-def refine(messages: list, answer: str, questions_asked: int, max_questions: int) -> tuple[dict, list]:
+def refine(
+    messages: list, answer: str, questions_asked: int, max_questions: int
+) -> tuple[dict, list]:
     """Demo equivalent of :func:`recommender.refine_session`."""
     try:
         state = json.loads(messages[0]["content"]) if messages else {}
@@ -220,7 +225,10 @@ def refine(messages: list, answer: str, questions_asked: int, max_questions: int
             "These are your final recommendations! \U0001f389"
         )
     else:
-        message = f"Got it \u2014 I've updated your matches, and {top} is looking like a strong fit."
+        message = (
+            f"Got it \u2014 I've updated your matches, and {top} is looking "
+            "like a strong fit."
+        )
 
     data = {
         "scores": scores,

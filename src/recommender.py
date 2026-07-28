@@ -16,11 +16,15 @@ fragile string parsing and no use of ``eval`` (unlike the original skeleton).
 from __future__ import annotations
 
 import json
+import logging
 import os
 
-from google.genai import errors as genai_errors, types
+from google.genai import errors as genai_errors
+from google.genai import types
 
 from . import demo as _demo
+from .cache import profile_cache
+from .dataset import major_dataset
 from .utils import (
     CATEGORIES,
     COMMON_MAJORS,
@@ -30,8 +34,16 @@ from .utils import (
     get_model,
 )
 
+logger = logging.getLogger(__name__)
+
 # How many refining follow-up questions to ask before finalising.
 MAX_QUESTIONS = 6
+
+
+def _finalize(result: dict) -> dict:
+    """Ground the recommendations in real labour-market data and re-rank them."""
+    result["recommendations"] = major_dataset.ground_recommendations(result["recommendations"])
+    return result
 
 
 def _demo_enabled() -> bool:
@@ -230,7 +242,14 @@ def start_session(form: dict) -> tuple[dict, list[dict]]:
     profile = build_profile_summary(form)
     if _demo_enabled():
         data, messages = _demo.start(form, profile)
-        return _normalise(data), messages
+        return _finalize(_normalise(data)), messages
+
+    # Serve effectively-identical profiles from cache instead of re-calling Gemini.
+    cached = profile_cache.get(form)
+    if cached is not None:
+        logger.info("serving initial recommendation from cache", extra={"event": "cache_hit"})
+        return cached
+
     user_prompt = (
         f"{profile}\n\n"
         "Assess this student now. Provide their trait scores, 4-6 major "
@@ -246,16 +265,23 @@ def start_session(form: dict) -> tuple[dict, list[dict]]:
         data = _chat_json(messages)
     except CapacityError:
         if _auto_demo_fallback_enabled():
+            logger.warning(
+                "Gemini unavailable; falling back to demo mode",
+                extra={"event": "capacity_fallback", "endpoint": "start"},
+            )
             data, messages = _demo.start(form, profile)
             data["message"] = (
                 "The Gemini API is unavailable right now, so I switched to free "
                 "demo mode for this session. " + data.get("message", "")
             ).strip()
-            return _normalise(data), messages
+            return _finalize(_normalise(data)), messages
         raise
 
     result = _normalise(data)
     messages.append({"role": "assistant", "content": json.dumps(data)})
+    # Cache the genuine Gemini result (grounded + never a demo fallback) for reuse.
+    result = _finalize(result)
+    profile_cache.set(form, (result, messages))
     return result, messages
 
 
@@ -274,7 +300,7 @@ def refine_session(
     """
     if _demo_enabled() or (messages and messages[0].get("role") == "demo"):
         data, messages = _demo.refine(messages, answer, questions_asked, MAX_QUESTIONS)
-        return _normalise(data), messages
+        return _finalize(_normalise(data)), messages
 
     finalize = questions_asked + 1 >= MAX_QUESTIONS
     instruction = (
@@ -296,6 +322,10 @@ def refine_session(
     except CapacityError:
         if not _auto_demo_fallback_enabled():
             raise
+        logger.warning(
+            "Gemini unavailable; falling back to demo mode",
+            extra={"event": "capacity_fallback", "endpoint": "chat"},
+        )
         demo_messages = (
             messages if messages and messages[0].get("role") == "demo"
             else _seed_demo_from_messages(messages)
@@ -315,4 +345,4 @@ def refine_session(
     if finalize:
         result["question"] = ""
     messages.append({"role": "assistant", "content": json.dumps(data)})
-    return result, messages
+    return _finalize(result), messages
