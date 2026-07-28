@@ -1,0 +1,11 @@
+# Ruff configuration — https://docs.astral.sh/ruff/
+target-version = "py313"
+line-length = 100
+
+# Directories that never need linting.
+extend-exclude = [".venv", "instance", "build", "dist"]
+
+[lint]
+# Roughly a flake8-equivalent core (pycodestyle errors/warnings + pyflakes)
+# plus import sorting (isort).
+select = ["E", "F", "W", "I"]
