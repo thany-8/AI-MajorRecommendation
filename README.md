@@ -29,6 +29,9 @@ from the AI advisor.*
 - 💾 **Remembers you** – profiles, past recommendation sessions and your
   "was this major helpful?" feedback are saved to a database (SQLite out of the
   box, or PostgreSQL), so returning visitors can revisit their earlier matches.
+- 🔐 **Accounts** – optional email/password sign-up so your history **syncs
+  across devices** (guest history is adopted when you register); write endpoints
+  are protected against CSRF.
 - ⚡ **Fast & resilient** – repeated profiles are served from an in-process
   cache (no repeat Gemini calls), per-user/session **rate limiting** protects
   the API, and **structured JSON logs**, request ids and a `/healthz` endpoint
@@ -94,6 +97,7 @@ Set these in your `.env` file (see `.env.example`):
 | `GEMINI_MODEL`       | no    | `gemini-3.5-flash` | Gemini model used for recommendations.                         |
 | `DATABASE_URL`       | no    | SQLite file        | Where to store profiles, sessions & feedback (see below).      |
 | `FLASK_SECRET_KEY`   | no    | dev fallback       | Secret used to sign session cookies.                           |
+| `CSRF_ENABLED`       | no    | `1`                | CSRF protection on state-changing API requests.                |
 | `CACHE_ENABLED` / `CACHE_TTL` / `CACHE_MAXSIZE` | no | `1` / `3600` / `512` | In-process cache of initial recommendations.        |
 | `RATELIMIT_ENABLED` / `RATELIMIT_START` / `RATELIMIT_CHAT` | no | `1` / `15 per minute` / `40 per minute` | Per-user/session API rate limits. |
 | `RATELIMIT_STORAGE_URI` | no | `memory://`     | Rate-limit counter store (use `redis://…` for multi-process).  |
@@ -262,6 +266,7 @@ AI-MajorRecommendation/
 │   ├── test_cache.py
 │   ├── test_dataset.py
 │   ├── test_observability.py
+│   ├── test_auth.py
 │   └── test_app.py
 └── src/
     ├── recommender.py         # Recommendation engine: one JSON call per turn
@@ -279,12 +284,16 @@ AI-MajorRecommendation/
 The browser talks to a **versioned JSON API** under `/api/v1`, described by an
 OpenAPI 3 specification and browsable with **Swagger UI**:
 
-| Method & path           | Description                                           |
-| ----------------------- | ---------------------------------------------------- |
-| `POST /api/v1/start`    | Start a session from the profile form.               |
-| `POST /api/v1/chat`     | Refine the recommendation with the student's answer. |
-| `POST /api/v1/feedback` | Record "was this major helpful?" feedback.           |
-| `GET  /api/v1/history`  | List the returning visitor's past sessions.          |
+| Method & path             | Description                                           |
+| ------------------------- | ----------------------------------------------------- |
+| `POST /api/v1/start`      | Start a session from the profile form.               |
+| `POST /api/v1/chat`       | Refine the recommendation with the student's answer. |
+| `POST /api/v1/feedback`   | Record "was this major helpful?" feedback.           |
+| `GET  /api/v1/history`    | List the current user's past sessions.               |
+| `GET  /api/v1/auth/me`    | Current auth state + CSRF token.                     |
+| `POST /api/v1/auth/register` | Create an account (adopts guest history).         |
+| `POST /api/v1/auth/login`    | Sign in.                                          |
+| `POST /api/v1/auth/logout`   | Sign out.                                         |
 
 Interactive documentation (with request/response schemas and "Try it out"),
 once the app is running:
@@ -296,6 +305,17 @@ Requests are validated against [Pydantic](https://docs.pydantic.dev/) models in
 `src/schemas.py`. A malformed body returns **422** with an
 `{ "error", "details" }` envelope; semantic problems (e.g. an expired session or
 unknown feedback target) return **400/404**.
+
+### Accounts & CSRF
+
+Accounts are optional email/password (server-side sessions, passwords hashed
+with Werkzeug PBKDF2). Registering while browsing as a guest **adopts** that
+guest's saved history, so signing in on another device shows the same sessions.
+
+State-changing API requests (all `POST`s) are protected with a **double-submit
+CSRF token**: the token is issued in the session, exposed via a `<meta>` tag and
+`GET /api/v1/auth/me`, and must be echoed in the `X-CSRFToken` header. The SPA
+does this automatically; programmatic clients should read the token first.
 
 ## How it works
 
@@ -343,6 +363,12 @@ unknown feedback target) return **400/404**.
   same SQLAlchemy code runs on Postgres via `DATABASE_URL`. Persistence is
   **best-effort** — a database outage disables history/feedback but never breaks
   the core recommendation flow.
+- **Why session auth + double-submit CSRF?** The app already uses signed,
+  `HttpOnly`, `SameSite=Lax` session cookies, so server-side sessions are the
+  natural fit (no token storage in JS). Passwords are hashed with Werkzeug
+  PBKDF2 — no extra dependency. CSRF uses a hand-rolled double-submit token
+  (issued in the session, echoed in `X-CSRFToken`) rather than pulling in
+  Flask-WTF/WTForms just for one check.
 
 ## What I'd do with more time
 
@@ -353,8 +379,8 @@ unknown feedback target) return **400/404**.
 - **Richer grounding:** add **O*NET** interest/skill profiles for a personality-
   *fit* re-rank to complement outcomes, and a fresher, major-complete dataset
   (e.g. College Scorecard via CIP codes); show earnings ranges (P25–P75).
-- **Accounts & auth:** replace the anonymous cookie identity with real accounts
-  so history syncs across devices, plus CSRF protection on write endpoints.
+- **Accounts polish:** build on the new email/password accounts with social
+  login (OAuth), email verification and password reset.
 - **Quality harness:** a set of golden profiles with regression tests on
   recommendation quality to catch prompt/model drift over time.
 - **Delivery:** containerise, add a CI/CD deploy (Fly/Render) with a Gunicorn
