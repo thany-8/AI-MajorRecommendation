@@ -44,6 +44,10 @@ def test_openapi_spec_is_served(client):
         "/api/v1/chat",
         "/api/v1/feedback",
         "/api/v1/history",
+        "/api/v1/auth/me",
+        "/api/v1/auth/register",
+        "/api/v1/auth/login",
+        "/api/v1/auth/logout",
     }
 
 

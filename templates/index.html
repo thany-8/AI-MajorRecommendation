@@ -5,10 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MajorMatch · Find the university major you'll love</title>
   <meta name="description" content="An AI advisor that recommends university majors based on your interests, hobbies and strengths.">
+  <meta name="csrf-token" content="{{ csrf_token }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body data-max-questions="{{ max_questions }}">
   <header class="site-header">
+    <div id="auth-bar" class="auth-bar">
+      <span id="auth-email" class="auth-email hidden"></span>
+      <button id="login-btn" class="btn btn-ghost btn-sm" type="button">Log in</button>
+      <button id="signup-btn" class="btn btn-primary btn-sm" type="button">Sign up</button>
+      <button id="logout-btn" class="btn btn-ghost btn-sm hidden" type="button">Log out</button>
+    </div>
     <div class="brand">
       <span class="brand-mark" aria-hidden="true">🎓</span>
       <span class="brand-name">Major<span class="accent">Match</span></span>
@@ -132,6 +139,31 @@
   <footer class="site-footer">
     <p>Powered by Google Gemini · Recommendations are guidance, not a guarantee.</p>
   </footer>
+
+  <!-- Auth modal (log in / sign up) -->
+  <div id="auth-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+    <div class="modal">
+      <button id="auth-close" class="modal-close" type="button" aria-label="Close">×</button>
+      <h2 id="auth-title" class="modal-title">Log in</h2>
+      <p class="modal-sub" id="auth-sub">Sign in to sync your matches across devices.</p>
+      <form id="auth-form" class="auth-form" novalidate>
+        <div class="field">
+          <label for="auth-email-input">Email</label>
+          <input id="auth-email-input" name="email" type="email" autocomplete="email" placeholder="you@example.com">
+        </div>
+        <div class="field">
+          <label for="auth-password-input">Password</label>
+          <input id="auth-password-input" name="password" type="password" autocomplete="current-password" placeholder="At least 8 characters">
+        </div>
+        <p id="auth-error" class="auth-error hidden"></p>
+        <button type="submit" id="auth-submit" class="btn btn-primary btn-lg">Log in</button>
+      </form>
+      <p class="auth-switch">
+        <span id="auth-switch-text">New here?</span>
+        <button id="auth-switch-btn" class="link-btn" type="button">Create an account</button>
+      </p>
+    </div>
+  </div>
 
   <div id="toast" class="toast hidden" role="alert"></div>
 

@@ -37,6 +37,10 @@ from sqlalchemy import (
     Text,
     create_engine,
     select,
+    text,
+)
+from sqlalchemy import (
+    inspect as sa_inspect,
 )
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import (
@@ -48,12 +52,18 @@ from sqlalchemy.orm import (
     sessionmaker,
 )
 from sqlalchemy.types import JSON
+from werkzeug.security import check_password_hash, generate_password_hash
 
 logger = logging.getLogger(__name__)
 
 # Default on-disk SQLite database (relative to the current working directory).
 # app.py overrides this with a path inside the Flask instance folder.
 DEFAULT_DATABASE_URL = "sqlite:///majormatch.db"
+
+# A constant hash compared against when a login email is unknown, so that
+# authentication takes a similar amount of time whether or not the account
+# exists (mitigates user-enumeration via timing).
+_DUMMY_PASSWORD_HASH = generate_password_hash("majormatch-dummy", method="pbkdf2:sha256")
 
 # Module-level engine/session factory, configured by init_app().
 _engine = None
@@ -71,12 +81,20 @@ class Base(DeclarativeBase):
 
 
 class User(Base):
-    """An anonymous returning visitor, identified by an opaque cookie token."""
+    """A visitor.
+
+    Anonymous visitors are identified by an opaque cookie ``token``. When a
+    visitor registers, ``email`` and ``password_hash`` are set on their row (an
+    existing anonymous row can be upgraded in place, so guest history carries
+    over) and they can then sign in from any device.
+    """
 
     __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     token: Mapped[str] = mapped_column(String(64), unique=True, index=True, nullable=False)
+    email: Mapped[str | None] = mapped_column(String(255), unique=True, index=True, nullable=True)
+    password_hash: Mapped[str | None] = mapped_column(String(255), nullable=True)
     created_at: Mapped[_dt.datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
 
     profiles: Mapped[list["Profile"]] = relationship(
@@ -217,6 +235,7 @@ def init_app(database_url: str | None = None, echo: bool = False) -> bool:
             url, echo=echo, future=True, pool_pre_ping=True, connect_args=connect_args
         )
         Base.metadata.create_all(engine)
+        _migrate_users(engine)
     except (SQLAlchemyError, OSError, ImportError) as exc:
         _engine = None
         _Session = None
@@ -235,6 +254,28 @@ def init_app(database_url: str | None = None, echo: bool = False) -> bool:
 def is_enabled() -> bool:
     """Return ``True`` when a database has been initialised successfully."""
     return _enabled
+
+
+def _migrate_users(engine) -> None:
+    """Add the account columns/index to a pre-existing ``users`` table.
+
+    ``create_all`` only creates missing *tables*, so databases created before
+    accounts existed need the ``email`` / ``password_hash`` columns added. This
+    is a tiny, idempotent forward migration (a no-op on fresh databases).
+    """
+    try:
+        columns = {col["name"] for col in sa_inspect(engine).get_columns("users")}
+        statements = []
+        if "email" not in columns:
+            statements.append("ALTER TABLE users ADD COLUMN email VARCHAR(255)")
+        if "password_hash" not in columns:
+            statements.append("ALTER TABLE users ADD COLUMN password_hash VARCHAR(255)")
+        statements.append("CREATE UNIQUE INDEX IF NOT EXISTS ix_users_email ON users (email)")
+        with engine.begin() as conn:
+            for statement in statements:
+                conn.execute(text(statement))
+    except SQLAlchemyError as exc:  # pragma: no cover - defensive
+        logger.warning("User-account migration skipped: %s", exc)
 
 
 @contextmanager
@@ -262,25 +303,112 @@ def _get_or_create_user(session: Session, token: str) -> User:
     return user
 
 
+def _user_to_dict(user: User) -> dict:
+    """Public, JSON-friendly shape of a user (never includes the password)."""
+    return {
+        "id": user.id,
+        "email": user.email,
+        "is_anonymous": user.email is None,
+        "created_at": user.created_at.isoformat() if user.created_at else None,
+    }
+
+
+def get_or_create_anonymous(token: str) -> dict | None:
+    """Return the anonymous user for ``token``, creating it if needed."""
+    if not _enabled or not token:
+        return None
+    try:
+        with _session_scope() as session:
+            return _user_to_dict(_get_or_create_user(session, token))
+    except SQLAlchemyError as exc:
+        logger.warning("Could not resolve anonymous user: %s", exc)
+        return None
+
+
+def get_user(user_id: int | None) -> dict | None:
+    """Return the user with ``user_id``, or ``None``."""
+    if not _enabled or not user_id:
+        return None
+    try:
+        with _session_scope() as session:
+            user = session.get(User, user_id)
+            return _user_to_dict(user) if user else None
+    except SQLAlchemyError as exc:
+        logger.warning("Could not load user %s: %s", user_id, exc)
+        return None
+
+
+def create_account(
+    email: str, password: str, adopt_token: str | None = None
+) -> tuple[dict | None, str | None]:
+    """Register an account, returning ``(user, None)`` or ``(None, error)``.
+
+    If ``adopt_token`` points at an existing *anonymous* user, that row is
+    upgraded in place so the guest's saved sessions become the new account's.
+    """
+    if not _enabled:
+        return None, "Accounts are unavailable right now."
+    email = (email or "").strip().lower()
+    try:
+        with _session_scope() as session:
+            if session.scalar(select(User).where(User.email == email)) is not None:
+                return None, "That email is already registered. Try signing in."
+
+            user = None
+            if adopt_token:
+                candidate = session.scalar(select(User).where(User.token == adopt_token))
+                if candidate is not None and candidate.email is None:
+                    user = candidate  # upgrade the guest row (keeps its history)
+            if user is None:
+                user = User(token=new_user_token())
+                session.add(user)
+
+            user.email = email
+            user.password_hash = generate_password_hash(password, method="pbkdf2:sha256")
+            session.flush()
+            return _user_to_dict(user), None
+    except SQLAlchemyError as exc:
+        logger.warning("Could not create account: %s", exc)
+        return None, "Could not create the account. Please try again."
+
+
+def authenticate(email: str, password: str) -> dict | None:
+    """Return the user for valid ``email``/``password`` credentials, else None."""
+    if not _enabled:
+        return None
+    email = (email or "").strip().lower()
+    try:
+        with _session_scope() as session:
+            user = session.scalar(select(User).where(User.email == email))
+            if user is None or not user.password_hash:
+                check_password_hash(_DUMMY_PASSWORD_HASH, password or "")  # constant-ish time
+                return None
+            if not check_password_hash(user.password_hash, password or ""):
+                return None
+            return _user_to_dict(user)
+    except SQLAlchemyError as exc:
+        logger.warning("Could not authenticate: %s", exc)
+        return None
+
+
 def record_start(
-    token: str,
+    user_id: int | None,
     public_id: str,
     form: dict,
     result: dict,
     questions_asked: int,
     is_demo: bool = False,
 ) -> None:
-    """Persist a new session: user (if new), profile snapshot and first result.
+    """Persist a new session: profile snapshot and first result for ``user_id``.
 
     Best-effort: any failure is logged and swallowed.
     """
-    if not _enabled:
+    if not _enabled or not user_id:
         return
     try:
         with _session_scope() as session:
-            user = _get_or_create_user(session, token)
             profile = Profile(
-                user_id=user.id,
+                user_id=user_id,
                 **{key: (str(form.get(key, "") or "")).strip() for key in Profile.FIELDS},
             )
             session.add(profile)
@@ -288,7 +416,7 @@ def record_start(
             session.add(
                 RecommendationSession(
                     public_id=public_id,
-                    user_id=user.id,
+                    user_id=user_id,
                     profile_id=profile.id,
                     status="completed" if result.get("done") else "active",
                     is_demo=is_demo,
@@ -358,18 +486,15 @@ def record_feedback(
         return False
 
 
-def list_sessions(token: str, limit: int = 8) -> list[dict]:
+def list_sessions(user_id: int | None, limit: int = 8) -> list[dict]:
     """Return a user's recent sessions, newest first, as plain dicts."""
-    if not _enabled:
+    if not _enabled or not user_id:
         return []
     try:
         with _session_scope() as session:
-            user = session.scalar(select(User).where(User.token == token))
-            if user is None:
-                return []
             rows = session.scalars(
                 select(RecommendationSession)
-                .where(RecommendationSession.user_id == user.id)
+                .where(RecommendationSession.user_id == user_id)
                 .order_by(RecommendationSession.created_at.desc())
                 .limit(limit)
             ).all()

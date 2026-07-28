@@ -28,9 +28,30 @@
   const loader = document.getElementById("loader");
   const loaderText = document.getElementById("loader-text");
 
+  // Auth elements
+  const authEmail = document.getElementById("auth-email");
+  const loginBtn = document.getElementById("login-btn");
+  const signupBtn = document.getElementById("signup-btn");
+  const logoutBtn = document.getElementById("logout-btn");
+  const authModal = document.getElementById("auth-modal");
+  const authClose = document.getElementById("auth-close");
+  const authForm = document.getElementById("auth-form");
+  const authTitle = document.getElementById("auth-title");
+  const authSub = document.getElementById("auth-sub");
+  const authSubmit = document.getElementById("auth-submit");
+  const authError = document.getElementById("auth-error");
+  const authSwitchText = document.getElementById("auth-switch-text");
+  const authSwitchBtn = document.getElementById("auth-switch-btn");
+  const authEmailInput = document.getElementById("auth-email-input");
+  const authPasswordInput = document.getElementById("auth-password-input");
+
   let toastTimer = null;
   // Public id of the session currently on screen; used to attach feedback.
   let currentSessionId = null;
+  // CSRF token (double-submit): read from the page, refreshed from /auth/me.
+  const metaCsrf = document.querySelector('meta[name="csrf-token"]');
+  let csrfToken = metaCsrf ? metaCsrf.getAttribute("content") : "";
+  let authMode = "login"; // or "register"
 
   // --- Helpers ---
   function showLoader(text) {
@@ -50,7 +71,7 @@
   async function postJSON(url, body) {
     const res = await fetch(url, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
       body: JSON.stringify(body),
     });
     const data = await res.json().catch(() => ({}));
@@ -371,11 +392,116 @@
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
+  // --- Auth ---
+  function renderAuth(state) {
+    const authed = state && state.authenticated;
+    if (state && state.csrf_token) csrfToken = state.csrf_token;
+    if (authed) {
+      authEmail.textContent = state.email;
+      authEmail.classList.remove("hidden");
+      logoutBtn.classList.remove("hidden");
+      loginBtn.classList.add("hidden");
+      signupBtn.classList.add("hidden");
+    } else {
+      authEmail.classList.add("hidden");
+      logoutBtn.classList.add("hidden");
+      loginBtn.classList.remove("hidden");
+      signupBtn.classList.remove("hidden");
+    }
+  }
+
+  async function loadAuth() {
+    try {
+      const res = await fetch("/api/v1/auth/me", { headers: { Accept: "application/json" } });
+      if (res.ok) renderAuth(await res.json());
+    } catch (err) {
+      /* auth is a progressive enhancement; ignore failures */
+    }
+  }
+
+  function setAuthMode(mode) {
+    authMode = mode;
+    const isRegister = mode === "register";
+    authTitle.textContent = isRegister ? "Sign up" : "Log in";
+    authSubmit.textContent = isRegister ? "Create account" : "Log in";
+    authSub.textContent = isRegister
+      ? "Create an account to save and sync your matches."
+      : "Sign in to sync your matches across devices.";
+    authSwitchText.textContent = isRegister ? "Already have an account?" : "New here?";
+    authSwitchBtn.textContent = isRegister ? "Log in" : "Create an account";
+    authPasswordInput.setAttribute(
+      "autocomplete", isRegister ? "new-password" : "current-password"
+    );
+    authError.classList.add("hidden");
+  }
+
+  function openAuth(mode) {
+    setAuthMode(mode);
+    authModal.classList.remove("hidden");
+    authEmailInput.focus();
+  }
+
+  function closeAuth() {
+    authModal.classList.add("hidden");
+    authForm.reset();
+    authError.classList.add("hidden");
+  }
+
+  async function handleAuthSubmit(event) {
+    event.preventDefault();
+    const email = authEmailInput.value.trim();
+    const password = authPasswordInput.value;
+    if (!email || !password) {
+      authError.textContent = "Enter your email and password.";
+      authError.classList.remove("hidden");
+      return;
+    }
+    authSubmit.disabled = true;
+    const url = authMode === "register" ? "/api/v1/auth/register" : "/api/v1/auth/login";
+    try {
+      const data = await postJSON(url, { email: email, password: password });
+      renderAuth(data);
+      closeAuth();
+      showToast(authMode === "register" ? "Account created — welcome!" : "Signed in.");
+      loadHistory();
+    } catch (err) {
+      authError.textContent = err.message;
+      authError.classList.remove("hidden");
+    } finally {
+      authSubmit.disabled = false;
+    }
+  }
+
+  async function handleLogout() {
+    try {
+      const data = await postJSON("/api/v1/auth/logout", {});
+      renderAuth(data);
+      showToast("Signed out.");
+      loadHistory();
+    } catch (err) {
+      showToast(err.message);
+    }
+  }
+
   // --- Wire up ---
   profileForm.addEventListener("submit", handleStart);
   chatForm.addEventListener("submit", handleChat);
   restartBtn.addEventListener("click", handleRestart);
   recommendationsEl.addEventListener("click", handleFeedbackClick);
   historyHide.addEventListener("click", () => historyEl.classList.add("hidden"));
+
+  loginBtn.addEventListener("click", () => openAuth("login"));
+  signupBtn.addEventListener("click", () => openAuth("register"));
+  logoutBtn.addEventListener("click", handleLogout);
+  authClose.addEventListener("click", closeAuth);
+  authSwitchBtn.addEventListener("click", () =>
+    setAuthMode(authMode === "register" ? "login" : "register")
+  );
+  authForm.addEventListener("submit", handleAuthSubmit);
+  authModal.addEventListener("click", (e) => {
+    if (e.target === authModal) closeAuth();
+  });
+
+  loadAuth();
   loadHistory();
 })();

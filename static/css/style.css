@@ -403,6 +403,71 @@ input:focus, textarea:focus, select:focus {
   padding: 10px 20px 30px;
 }
 
+/* ---- Auth bar + modal ---- */
+.site-header { position: relative; }
+.auth-bar {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.auth-email { color: #dfe2ff; font-size: 0.88rem; font-weight: 600; }
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 18, 38, 0.62);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 50;
+  backdrop-filter: blur(2px);
+}
+.modal {
+  position: relative;
+  background: var(--panel);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 28px;
+  width: 100%;
+  max-width: 400px;
+  animation: rise 0.25s ease both;
+}
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  border: none;
+  background: transparent;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--muted);
+  cursor: pointer;
+}
+.modal-title { margin: 0 0 4px; font-size: 1.4rem; }
+.modal-sub { margin: 0 0 18px; color: var(--ink-soft); font-size: 0.92rem; }
+.auth-form .field { margin-bottom: 14px; }
+.auth-form .btn-lg { width: 100%; }
+.auth-error {
+  margin: 0 0 12px;
+  color: var(--danger);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+.auth-switch { margin: 16px 0 0; text-align: center; font-size: 0.9rem; color: var(--ink-soft); }
+.link-btn {
+  border: none;
+  background: none;
+  color: var(--brand-ink);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0 2px;
+}
+
 /* ---- Animations ---- */
 @keyframes spin { to { transform: rotate(360deg); } }
 @keyframes rise {

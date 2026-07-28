@@ -107,6 +107,7 @@ def _reset_shared_state():
     observability.metrics.reset()
     app_module.limiter.enabled = False
     app_module.limiter.reset()
+    app_module.app.config["CSRF_ENABLED"] = False  # CSRF-specific tests re-enable it
     yield
 
 

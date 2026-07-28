@@ -19,10 +19,11 @@ Operational:
 """
 
 import os
+import secrets
 import uuid
 
 from dotenv import load_dotenv
-from flask import jsonify, make_response, render_template, session
+from flask import jsonify, make_response, render_template, request, session
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_openapi3 import APIBlueprint, Info, OpenAPI, Tag
@@ -43,6 +44,14 @@ observability.configure_logging()
 observability.init_error_monitoring()
 
 
+def _error_message(err: dict) -> str:
+    """Extract a clean, user-facing message from a Pydantic error entry."""
+    ctx = err.get("ctx") or {}
+    if "error" in ctx:  # our custom ValueError validators put the message here
+        return str(ctx["error"])
+    return err.get("msg", "Invalid request.")
+
+
 def _on_validation_error(e: ValidationError):
     """Render request-validation failures as a consistent JSON error envelope.
 
@@ -51,7 +60,7 @@ def _on_validation_error(e: ValidationError):
     ``details`` (see :class:`src.schemas.ErrorResponse`).
     """
     details = [
-        {"loc": list(err.get("loc", ())), "msg": err.get("msg", ""), "type": err.get("type", "")}
+        {"loc": list(err.get("loc", ())), "msg": _error_message(err), "type": err.get("type", "")}
         for err in e.errors()
     ]
     message = details[0]["msg"] if details else "Invalid request."
@@ -85,6 +94,14 @@ if not app.secret_key:
         "FLASK_SECRET_KEY is missing. Add it to your .env file."
     )
 
+# Harden the session cookie and enable CSRF protection on state-changing API
+# requests (disable in tests via CSRF_ENABLED=0).
+app.config["SESSION_COOKIE_HTTPONLY"] = True
+app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+app.config["CSRF_ENABLED"] = os.getenv("CSRF_ENABLED", "1").strip().lower() in (
+    "1", "true", "yes", "on",
+)
+
 # Initialise persistence for user profiles, sessions and feedback. Uses
 # DATABASE_URL when set (e.g. a Postgres URL), otherwise a local SQLite file in
 # the Flask instance folder. If this fails the app still runs; persistence is
@@ -100,9 +117,12 @@ def _ratelimit_enabled() -> bool:
 
 
 def _rate_limit_key() -> str:
-    """Rate-limit per returning visitor (cookie token), falling back to IP."""
-    uid = session.get("uid")
-    return f"user:{uid}" if uid else get_remote_address()
+    """Rate-limit per signed-in account, else per anonymous visitor, else IP."""
+    account_id = session.get("user_id")
+    if account_id:
+        return f"user:{account_id}"
+    anon = session.get("uid")
+    return f"anon:{anon}" if anon else get_remote_address()
 
 
 # Per-user/session rate limiting. In-memory storage is fine for a single worker;
@@ -111,6 +131,7 @@ def _rate_limit_key() -> str:
 _START_LIMIT = os.getenv("RATELIMIT_START", "15 per minute")
 _CHAT_LIMIT = os.getenv("RATELIMIT_CHAT", "40 per minute")
 _WRITE_LIMIT = os.getenv("RATELIMIT_DEFAULT", "60 per minute")
+_AUTH_LIMIT = os.getenv("RATELIMIT_AUTH", "10 per minute")
 
 limiter = Limiter(
     key_func=_rate_limit_key,
@@ -128,15 +149,60 @@ observability.install(app)
 # model message history out of the (4 KB) signed session cookie.
 _SESSIONS: dict[str, dict] = {}
 
+_SAFE_METHODS = {"GET", "HEAD", "OPTIONS"}
 
-def _user_token() -> str:
-    """Return the returning-visitor token, creating one in the cookie if new."""
+
+def _csrf_token() -> str:
+    """Return the per-session CSRF token, creating one on first use."""
+    token = session.get("csrf_token")
+    if not token:
+        token = secrets.token_urlsafe(32)
+        session["csrf_token"] = token
+    return token
+
+
+@app.before_request
+def _csrf_protect():
+    """Double-submit CSRF check: state-changing /api requests must echo the
+    session CSRF token in the ``X-CSRFToken`` header."""
+    _csrf_token()  # ensure a token exists for the page/meta tag
+    if not app.config.get("CSRF_ENABLED", True):
+        return None
+    if request.method in _SAFE_METHODS or not request.path.startswith("/api/"):
+        return None
+    sent = request.headers.get("X-CSRFToken") or request.headers.get("X-CSRF-Token")
+    if not sent or not secrets.compare_digest(sent, session.get("csrf_token", "")):
+        return jsonify({"error": "CSRF token missing or invalid. Reload the page."}), 403
+    return None
+
+
+def _current_user_id(create: bool = False) -> int | None:
+    """Resolve the current user id: signed-in account, else anonymous visitor.
+
+    With ``create=True`` an anonymous cookie/identity is minted if none exists
+    (used on writes); reads pass ``create=False`` so they never create rows.
+    """
+    account_id = session.get("user_id")
+    if account_id:
+        return account_id
     token = session.get("uid")
     if not token:
+        if not create:
+            return None
         token = storage.new_user_token()
         session["uid"] = token
         session.permanent = True
-    return token
+    user = storage.get_or_create_anonymous(token)
+    return user["id"] if user else None
+
+
+def _auth_payload(account: dict | None) -> dict:
+    """Build the authentication-state response, including the CSRF token."""
+    return {
+        "authenticated": bool(account and not account.get("is_anonymous")),
+        "email": account.get("email") if account else None,
+        "csrf_token": _csrf_token(),
+    }
 
 
 def _is_demo(messages: list[dict]) -> bool:
@@ -147,7 +213,9 @@ def _is_demo(messages: list[dict]) -> bool:
 @app.route("/")
 def index():
     """Render the single-page app shell (not part of the JSON API)."""
-    return render_template("index.html", max_questions=MAX_QUESTIONS)
+    return render_template(
+        "index.html", max_questions=MAX_QUESTIONS, csrf_token=_csrf_token()
+    )
 
 
 @app.route("/healthz")
@@ -212,7 +280,8 @@ def api_start(body: schemas.ProfileForm):
     # persistence is enabled we hand the session id to the browser so it can
     # later attach "was this helpful?" feedback to this exact session.
     storage.record_start(
-        _user_token(), sid, form, result, questions_asked=1, is_demo=_is_demo(messages)
+        _current_user_id(create=True), sid, form, result,
+        questions_asked=1, is_demo=_is_demo(messages),
     )
     if storage.is_enabled():
         result["session_id"] = sid
@@ -314,10 +383,89 @@ def api_feedback(body: schemas.FeedbackRequest):
 )
 @limiter.limit(_WRITE_LIMIT)
 def api_history():
-    """Return the returning visitor's most recent recommendation sessions."""
-    token = session.get("uid")
-    sessions = storage.list_sessions(token) if token else []
-    return jsonify({"sessions": sessions})
+    """Return the current user's most recent recommendation sessions."""
+    return jsonify({"sessions": storage.list_sessions(_current_user_id())})
+
+
+# --- Accounts & authentication --------------------------------------------- #
+_AUTH_TAG = Tag(name="Auth", description="Accounts and sessions (email + password).")
+
+
+@api.get(
+    "/auth/me",
+    tags=[_AUTH_TAG],
+    summary="Current authentication state",
+    description="Return whether an account is signed in, plus the CSRF token to "
+                "send as the X-CSRFToken header on write requests.",
+    responses={200: schemas.UserResponse},
+)
+def api_me():
+    """Return the current authentication state and CSRF token."""
+    account_id = session.get("user_id")
+    account = storage.get_user(account_id) if account_id else None
+    return jsonify(_auth_payload(account))
+
+
+@api.post(
+    "/auth/register",
+    tags=[_AUTH_TAG],
+    summary="Create an account",
+    description="Register with email + password. Any recommendations made as a "
+                "guest in this browser are adopted into the new account.",
+    responses={
+        201: schemas.UserResponse,
+        409: schemas.ErrorResponse,
+        422: schemas.ErrorResponse,
+        429: schemas.ErrorResponse,
+    },
+)
+@limiter.limit(_AUTH_LIMIT)
+def api_register(body: schemas.RegisterRequest):
+    """Create a new account, adopting the current guest's history."""
+    account, error = storage.create_account(
+        body.email, body.password, adopt_token=session.get("uid")
+    )
+    if error:
+        return jsonify({"error": error}), 409
+    session["user_id"] = account["id"]
+    session.permanent = True
+    return jsonify(_auth_payload(account)), 201
+
+
+@api.post(
+    "/auth/login",
+    tags=[_AUTH_TAG],
+    summary="Sign in",
+    description="Sign in to an existing account. History then syncs across devices.",
+    responses={
+        200: schemas.UserResponse,
+        401: schemas.ErrorResponse,
+        422: schemas.ErrorResponse,
+        429: schemas.ErrorResponse,
+    },
+)
+@limiter.limit(_AUTH_LIMIT)
+def api_login(body: schemas.LoginRequest):
+    """Authenticate and start a signed-in session."""
+    account = storage.authenticate(body.email, body.password)
+    if not account:
+        return jsonify({"error": "Invalid email or password."}), 401
+    session["user_id"] = account["id"]
+    session.permanent = True
+    return jsonify(_auth_payload(account))
+
+
+@api.post(
+    "/auth/logout",
+    tags=[_AUTH_TAG],
+    summary="Sign out",
+    description="End the signed-in session (guest browsing continues).",
+    responses={200: schemas.UserResponse},
+)
+def api_logout():
+    """Clear the signed-in account from the session."""
+    session.pop("user_id", None)
+    return jsonify(_auth_payload(None))
 
 
 app.register_api(api)

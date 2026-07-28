@@ -9,9 +9,60 @@ These models do double duty:
   specification and the Swagger UI served under ``/api/docs``.
 """
 
-from pydantic import BaseModel, Field
+import re
+
+from pydantic import BaseModel, Field, field_validator
 
 from .utils import CATEGORIES
+
+_EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+
+
+# --------------------------------------------------------------------------- #
+# Authentication
+# --------------------------------------------------------------------------- #
+class RegisterRequest(BaseModel):
+    """Create an account."""
+
+    email: str = Field(..., description="Account email address.", examples=["you@example.com"])
+    password: str = Field(..., description="At least 8 characters.", examples=["correcthorse"])
+
+    @field_validator("email")
+    @classmethod
+    def _valid_email(cls, value: str) -> str:
+        value = (value or "").strip().lower()
+        if not _EMAIL_RE.match(value):
+            raise ValueError("Enter a valid email address.")
+        return value
+
+    @field_validator("password")
+    @classmethod
+    def _strong_enough(cls, value: str) -> str:
+        if len(value or "") < 8:
+            raise ValueError("Password must be at least 8 characters.")
+        return value
+
+
+class LoginRequest(BaseModel):
+    """Sign in to an existing account."""
+
+    email: str = Field(..., description="Account email address.", examples=["you@example.com"])
+    password: str = Field(..., description="Account password.")
+
+    @field_validator("email")
+    @classmethod
+    def _normalise_email(cls, value: str) -> str:
+        return (value or "").strip().lower()
+
+
+class UserResponse(BaseModel):
+    """The current authentication state."""
+
+    authenticated: bool = Field(..., description="Whether a real account is signed in.")
+    email: str | None = Field(None, description="Signed-in account email, if any.")
+    csrf_token: str | None = Field(
+        None, description="CSRF token to send as the X-CSRFToken header."
+    )
 
 
 # --------------------------------------------------------------------------- #
