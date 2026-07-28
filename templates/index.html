@@ -17,6 +17,16 @@
   </header>
 
   <main class="container">
+    <!-- Returning visitors: past sessions (populated by /api/history) -->
+    <section id="history" class="panel history hidden">
+      <div class="panel-head">
+        <h2>👋 Welcome back</h2>
+        <button id="history-hide" class="btn btn-ghost btn-sm" type="button">Hide</button>
+      </div>
+      <p class="history-sub">Pick up a past result, or start a new one below.</p>
+      <div id="history-list" class="history-list"></div>
+    </section>
+
     <!-- STEP 1 · Profile form -->
     <section id="intro" class="panel intro">
       <h1 class="intro-title">Find a major you'll love</h1>

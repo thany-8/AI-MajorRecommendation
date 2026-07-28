@@ -20,11 +20,17 @@
   const progressEl = document.getElementById("progress");
   const doneNote = document.getElementById("done-note");
 
+  const historyEl = document.getElementById("history");
+  const historyList = document.getElementById("history-list");
+  const historyHide = document.getElementById("history-hide");
+
   const toast = document.getElementById("toast");
   const loader = document.getElementById("loader");
   const loaderText = document.getElementById("loader-text");
 
   let toastTimer = null;
+  // Public id of the session currently on screen; used to attach feedback.
+  let currentSessionId = null;
 
   // --- Helpers ---
   function showLoader(text) {
@@ -61,7 +67,53 @@
   }
 
   // --- Rendering ---
-  function renderRecommendations(recs) {
+  function buildFeedback(major) {
+    const wrap = document.createElement("div");
+    wrap.className = "rec-feedback";
+    wrap.dataset.major = major;
+
+    const q = document.createElement("span");
+    q.className = "fb-q";
+    q.textContent = "Was this major helpful?";
+
+    const up = document.createElement("button");
+    up.type = "button";
+    up.className = "fb-btn";
+    up.dataset.helpful = "1";
+    up.setAttribute("aria-label", "Helpful");
+    up.textContent = "👍";
+
+    const down = document.createElement("button");
+    down.type = "button";
+    down.className = "fb-btn";
+    down.dataset.helpful = "0";
+    down.setAttribute("aria-label", "Not helpful");
+    down.textContent = "👎";
+
+    wrap.append(q, up, down);
+    return wrap;
+  }
+
+  function dataHTML(rec) {
+    const d = rec.data;
+    if (!d) return "";
+    if (!d.grounded) {
+      return '<p class="rec-data ungrounded" title="Not found in the reference dataset">' +
+        "📊 Not in our reference dataset</p>";
+    }
+    const parts = [];
+    if (d.median_earnings != null) {
+      parts.push("$" + Number(d.median_earnings).toLocaleString() + " median");
+    }
+    if (d.employment_rate != null) {
+      parts.push(Math.round(d.employment_rate * 100) + "% employed");
+    }
+    if (!parts.length) return "";
+    return '<p class="rec-data" title="Real labour-market data — U.S. Census ACS">📊 ' +
+      escapeHTML(parts.join(" · ")) + "</p>";
+  }
+
+  function renderRecommendations(recs, showFeedback) {
     recommendationsEl.innerHTML = "";
     (recs || []).forEach((rec, i) => {
       const card = document.createElement("div");
@@ -75,13 +127,41 @@
           '<span class="rec-match">' + rec.match + "%</span>" +
         "</div>" +
         '<div class="bar"><span></span></div>' +
-        '<p class="rec-why">' + escapeHTML(rec.why) + "</p>";
+        '<p class="rec-why">' + escapeHTML(rec.why) + "</p>" +
+        dataHTML(rec);
       recommendationsEl.appendChild(card);
+      if (showFeedback) {
+        card.appendChild(buildFeedback(rec.name));
+      }
       // Animate the bar after insertion.
       requestAnimationFrame(() => {
         card.querySelector(".bar > span").style.width = rec.match + "%";
       });
     });
+  }
+
+  async function handleFeedbackClick(event) {
+    const btn = event.target.closest(".fb-btn");
+    if (!btn || !recommendationsEl.contains(btn)) return;
+    const wrap = btn.closest(".rec-feedback");
+    if (!wrap || wrap.classList.contains("answered") || !currentSessionId) return;
+
+    const major = wrap.dataset.major || "";
+    const helpful = btn.dataset.helpful === "1";
+    wrap.classList.add("answered");
+    try {
+      await postJSON("/api/v1/feedback", {
+        session_id: currentSessionId,
+        major: major,
+        helpful: helpful,
+      });
+      wrap.textContent = helpful
+        ? "🎉 Thanks — glad it helped!"
+        : "🙏 Thanks — we'll keep improving.";
+    } catch (err) {
+      wrap.classList.remove("answered");
+      showToast(err.message);
+    }
   }
 
   function renderTraits(scores) {
@@ -116,7 +196,9 @@
   }
 
   function applyResult(data) {
-    renderRecommendations(data.recommendations);
+    if (data.session_id) currentSessionId = data.session_id;
+    const showFeedback = !!(data.done && currentSessionId);
+    renderRecommendations(data.recommendations, showFeedback);
     renderTraits(data.scores);
 
     if (data.message) addBubble(data.message, "advisor");
@@ -157,10 +239,12 @@
     };
 
     startBtn.disabled = true;
+    currentSessionId = null;
     showLoader("Analyzing your profile…");
     try {
-      const data = await postJSON("/api/start", form);
+      const data = await postJSON("/api/v1/start", form);
       intro.classList.add("hidden");
+      historyEl.classList.add("hidden");
       workspace.classList.remove("hidden");
       chatForm.classList.remove("hidden");
       doneNote.classList.add("hidden");
@@ -187,7 +271,7 @@
     typing.classList.add("typing");
 
     try {
-      const data = await postJSON("/api/chat", { answer: answer });
+      const data = await postJSON("/api/v1/chat", { answer: answer });
       typing.remove();
       applyResult(data);
     } catch (err) {
@@ -200,11 +284,90 @@
   }
 
   function handleRestart() {
+    currentSessionId = null;
     workspace.classList.add("hidden");
     intro.classList.remove("hidden");
+    chatForm.classList.remove("hidden");
+    doneNote.classList.add("hidden");
+    progressEl.textContent = "";
     chatEl.innerHTML = "";
     recommendationsEl.innerHTML = "";
     traitsEl.innerHTML = "";
+    loadHistory();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  // --- Past sessions (history) ---
+  function formatWhen(iso) {
+    if (!iso) return "";
+    // Stored timestamps are UTC; tag them so local display is correct.
+    if (!/(Z|[+-]\d\d:?\d\d)$/.test(iso)) iso += "Z";
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return "";
+    return (
+      d.toLocaleDateString(undefined, { month: "short", day: "numeric" }) +
+      ", " +
+      d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })
+    );
+  }
+
+  function renderHistory(sessions) {
+    historyList.innerHTML = "";
+    if (!sessions || !sessions.length) {
+      historyEl.classList.add("hidden");
+      return;
+    }
+    sessions.forEach((s) => {
+      const item = document.createElement("button");
+      item.type = "button";
+      item.className = "history-item";
+
+      const top = s.top_major || "Session";
+      const status = s.status === "completed" ? "Final" : "In progress";
+      const meta = status + (s.is_demo ? " · demo" : "") + " · " + formatWhen(s.created_at);
+
+      item.innerHTML =
+        '<span class="hi-major">' + escapeHTML(top) + "</span>" +
+        (s.top_match != null ? '<span class="hi-match">' + s.top_match + "%</span>" : "") +
+        '<span class="hi-meta">' + escapeHTML(meta) + "</span>";
+      item.addEventListener("click", () => viewSession(s));
+      historyList.appendChild(item);
+    });
+    historyEl.classList.remove("hidden");
+  }
+
+  async function loadHistory() {
+    try {
+      const res = await fetch("/api/v1/history", { headers: { Accept: "application/json" } });
+      if (!res.ok) return;
+      const data = await res.json();
+      renderHistory(data.sessions);
+    } catch (err) {
+      /* History is a nicety; ignore failures silently. */
+    }
+  }
+
+  function viewSession(s) {
+    currentSessionId = s.session_id || null;
+    const completed = s.status === "completed";
+
+    historyEl.classList.add("hidden");
+    intro.classList.add("hidden");
+    workspace.classList.remove("hidden");
+    chatEl.innerHTML = "";
+
+    renderRecommendations(s.recommendations, completed && !!currentSessionId);
+    renderTraits(s.scores);
+    if (s.message) addBubble(s.message, "advisor");
+    addBubble(
+      "You're viewing a saved session from " + formatWhen(s.created_at) +
+        ". Start over anytime to explore again.",
+      "advisor"
+    );
+
+    chatForm.classList.add("hidden");
+    doneNote.classList.remove("hidden");
+    progressEl.textContent = completed ? "Complete" : "Saved";
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -212,4 +375,7 @@
   profileForm.addEventListener("submit", handleStart);
   chatForm.addEventListener("submit", handleChat);
   restartBtn.addEventListener("click", handleRestart);
+  recommendationsEl.addEventListener("click", handleFeedbackClick);
+  historyHide.addEventListener("click", () => historyEl.classList.add("hidden"));
+  loadHistory();
 })();

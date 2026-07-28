@@ -199,6 +199,86 @@ input:focus, textarea:focus, select:focus {
   transition: width 0.7s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .rec-why { margin: 0; color: var(--ink-soft); font-size: 0.92rem; line-height: 1.45; }
+.rec-data {
+  margin: 8px 0 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--brand-ink);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #eef0ff;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+.rec-data.ungrounded {
+  color: var(--muted);
+  background: #f2f3f8;
+  font-weight: 500;
+}
+
+/* ---- Recommendation feedback (was this major helpful?) ---- */
+.rec-feedback {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line);
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  animation: rise 0.3s ease both;
+}
+.rec-feedback.answered {
+  border-top-style: solid;
+  color: var(--brand-ink);
+  font-weight: 600;
+}
+.fb-q { margin-right: auto; }
+.fb-btn {
+  border: 1.5px solid var(--line);
+  background: #fbfbff;
+  border-radius: 999px;
+  width: 34px;
+  height: 34px;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 0.06s ease, border-color 0.15s, background 0.15s;
+}
+.fb-btn:hover { border-color: var(--brand); background: #efe9ff; }
+.fb-btn:active { transform: translateY(1px); }
+.fb-btn:focus-visible { outline: none; box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.14); }
+
+/* ---- Past sessions (history) ---- */
+.history { max-width: 640px; margin: 0 auto 18px; }
+.history-sub { margin: -6px 0 14px; color: var(--ink-soft); font-size: 0.92rem; }
+.history-list { display: grid; gap: 10px; }
+.history-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 4px 12px;
+  width: 100%;
+  text-align: left;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: #fbfbff;
+  padding: 12px 16px;
+  cursor: pointer;
+  font: inherit;
+  color: var(--ink);
+  transition: transform 0.06s ease, border-color 0.15s, box-shadow 0.15s;
+}
+.history-item:hover {
+  border-color: var(--brand);
+  box-shadow: 0 8px 20px -12px rgba(108, 92, 231, 0.5);
+}
+.history-item:active { transform: translateY(1px); }
+.history-item:focus-visible { outline: none; box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.14); }
+.hi-major { font-weight: 800; font-size: 1.02rem; }
+.hi-match { font-weight: 800; color: var(--brand-ink); white-space: nowrap; }
+.hi-meta { grid-column: 1 / -1; color: var(--muted); font-size: 0.82rem; }
 
 /* ---- Trait bars ---- */
 .traits-title { margin: 0 0 14px; font-size: 1.05rem; }
