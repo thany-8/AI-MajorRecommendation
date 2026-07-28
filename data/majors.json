@@ -1,0 +1,1479 @@
+{
+  "meta": {
+    "source": "FiveThirtyEight College Majors (U.S. Census Bureau ACS PUMS)",
+    "source_url": "https://raw.githubusercontent.com/fivethirtyeight/data/master/college-majors/recent-grads.csv",
+    "license": "Data: ACS (public domain); compilation: CC BY 4.0 (FiveThirtyEight)",
+    "retrieved_at": "2026-07-28",
+    "major_count": 173,
+    "earnings_min": 22000,
+    "earnings_max": 110000
+  },
+  "categories": {
+    "Business": {
+      "count": 13,
+      "median_earnings": 40000,
+      "employment_rate": 0.9289
+    },
+    "Communications & Journalism": {
+      "count": 4,
+      "median_earnings": 35000,
+      "employment_rate": 0.9244
+    },
+    "Engineering": {
+      "count": 29,
+      "median_earnings": 57000,
+      "employment_rate": 0.9367
+    },
+    "Agriculture & Natural Resources": {
+      "count": 10,
+      "median_earnings": 35000,
+      "employment_rate": 0.9437
+    },
+    "Humanities & Liberal Arts": {
+      "count": 15,
+      "median_earnings": 32000,
+      "employment_rate": 0.919
+    },
+    "Computers & Mathematics": {
+      "count": 11,
+      "median_earnings": 45000,
+      "employment_rate": 0.9157
+    },
+    "Education": {
+      "count": 16,
+      "median_earnings": 32750,
+      "employment_rate": 0.9483
+    },
+    "Physical Sciences": {
+      "count": 10,
+      "median_earnings": 39500,
+      "employment_rate": 0.9535
+    },
+    "Biology & Life Science": {
+      "count": 14,
+      "median_earnings": 36300,
+      "employment_rate": 0.9391
+    },
+    "Psychology & Social Work": {
+      "count": 9,
+      "median_earnings": 30000,
+      "employment_rate": 0.928
+    },
+    "Arts": {
+      "count": 8,
+      "median_earnings": 30750,
+      "employment_rate": 0.9098
+    },
+    "Health": {
+      "count": 12,
+      "median_earnings": 35000,
+      "employment_rate": 0.9341
+    },
+    "Industrial Arts & Consumer Services": {
+      "count": 7,
+      "median_earnings": 35000,
+      "employment_rate": 0.9519
+    },
+    "Law & Public Policy": {
+      "count": 5,
+      "median_earnings": 36000,
+      "employment_rate": 0.9092
+    },
+    "Social Science": {
+      "count": 9,
+      "median_earnings": 38000,
+      "employment_rate": 0.9043
+    },
+    "Interdisciplinary": {
+      "count": 1,
+      "median_earnings": 35000,
+      "employment_rate": 0.9291
+    }
+  },
+  "majors": [
+    {
+      "name": "ACCOUNTING",
+      "category": "Business",
+      "grads": 198633,
+      "median_earnings": 45000,
+      "employment_rate": 0.9303,
+      "degree_job_share": 0.225
+    },
+    {
+      "name": "ACTUARIAL SCIENCE",
+      "category": "Business",
+      "grads": 3777,
+      "median_earnings": 62000,
+      "employment_rate": 0.9043,
+      "degree_job_share": 0.8492
+    },
+    {
+      "name": "ADVERTISING AND PUBLIC RELATIONS",
+      "category": "Communications & Journalism",
+      "grads": 53162,
+      "median_earnings": 35000,
+      "employment_rate": 0.932,
+      "degree_job_share": 0.2952
+    },
+    {
+      "name": "AEROSPACE ENGINEERING",
+      "category": "Engineering",
+      "grads": 15058,
+      "median_earnings": 60000,
+      "employment_rate": 0.9348,
+      "degree_job_share": 0.7714
+    },
+    {
+      "name": "AGRICULTURAL ECONOMICS",
+      "category": "Agriculture & Natural Resources",
+      "grads": 2439,
+      "median_earnings": 40000,
+      "employment_rate": 0.9228,
+      "degree_job_share": 0.3746
+    },
+    {
+      "name": "AGRICULTURE PRODUCTION AND MANAGEMENT",
+      "category": "Agriculture & Natural Resources",
+      "grads": 14240,
+      "median_earnings": 40000,
+      "employment_rate": 0.95,
+      "degree_job_share": 0.2363
+    },
+    {
+      "name": "ANIMAL SCIENCES",
+      "category": "Agriculture & Natural Resources",
+      "grads": 21573,
+      "median_earnings": 30000,
+      "employment_rate": 0.9491,
+      "degree_job_share": 0.3625
+    },
+    {
+      "name": "ANTHROPOLOGY AND ARCHEOLOGY",
+      "category": "Humanities & Liberal Arts",
+      "grads": 38844,
+      "median_earnings": 28000,
+      "employment_rate": 0.8972,
+      "degree_job_share": 0.37
+    },
+    {
+      "name": "APPLIED MATHEMATICS",
+      "category": "Computers & Mathematics",
+      "grads": 4939,
+      "median_earnings": 45000,
+      "employment_rate": 0.9092,
+      "degree_job_share": 0.7522
+    },
+    {
+      "name": "ARCHITECTURAL ENGINEERING",
+      "category": "Engineering",
+      "grads": 2825,
+      "median_earnings": 54000,
+      "employment_rate": 0.9381,
+      "degree_job_share": 0.7195
+    },
+    {
+      "name": "ARCHITECTURE",
+      "category": "Engineering",
+      "grads": 46420,
+      "median_earnings": 40000,
+      "employment_rate": 0.8867,
+      "degree_job_share": 0.541
+    },
+    {
+      "name": "AREA ETHNIC AND CIVILIZATION STUDIES",
+      "category": "Humanities & Liberal Arts",
+      "grads": 31195,
+      "median_earnings": 35000,
+      "employment_rate": 0.9366,
+      "degree_job_share": 0.4173
+    },
+    {
+      "name": "ART AND MUSIC EDUCATION",
+      "category": "Education",
+      "grads": 34181,
+      "median_earnings": 32100,
+      "employment_rate": 0.9614,
+      "degree_job_share": 0.716
+    },
+    {
+      "name": "ART HISTORY AND CRITICISM",
+      "category": "Humanities & Liberal Arts",
+      "grads": 21030,
+      "median_earnings": 31000,
+      "employment_rate": 0.9397,
+      "degree_job_share": 0.3454
+    },
+    {
+      "name": "ASTRONOMY AND ASTROPHYSICS",
+      "category": "Physical Sciences",
+      "grads": 1792,
+      "median_earnings": 62000,
+      "employment_rate": 0.9788,
+      "degree_job_share": 0.6603
+    },
+    {
+      "name": "ATMOSPHERIC SCIENCES AND METEOROLOGY",
+      "category": "Physical Sciences",
+      "grads": 4043,
+      "median_earnings": 35000,
+      "employment_rate": 0.9778,
+      "degree_job_share": 0.5786
+    },
+    {
+      "name": "BIOCHEMICAL SCIENCES",
+      "category": "Biology & Life Science",
+      "grads": 39107,
+      "median_earnings": 37400,
+      "employment_rate": 0.9195,
+      "degree_job_share": 0.6509
+    },
+    {
+      "name": "BIOLOGICAL ENGINEERING",
+      "category": "Engineering",
+      "grads": 8925,
+      "median_earnings": 57100,
+      "employment_rate": 0.9129,
+      "degree_job_share": 0.6932
+    },
+    {
+      "name": "BIOLOGY",
+      "category": "Biology & Life Science",
+      "grads": 280709,
+      "median_earnings": 33400,
+      "employment_rate": 0.9293,
+      "degree_job_share": 0.521
+    },
+    {
+      "name": "BIOMEDICAL ENGINEERING",
+      "category": "Engineering",
+      "grads": 14955,
+      "median_earnings": 60000,
+      "employment_rate": 0.9079,
+      "degree_job_share": 0.7227
+    },
+    {
+      "name": "BOTANY",
+      "category": "Biology & Life Science",
+      "grads": 1329,
+      "median_earnings": 37000,
+      "employment_rate": 1.0,
+      "degree_job_share": 0.7863
+    },
+    {
+      "name": "BUSINESS ECONOMICS",
+      "category": "Business",
+      "grads": 13302,
+      "median_earnings": 46000,
+      "employment_rate": 0.9036,
+      "degree_job_share": 0.2549
+    },
+    {
+      "name": "BUSINESS MANAGEMENT AND ADMINISTRATION",
+      "category": "Business",
+      "grads": 329927,
+      "median_earnings": 38000,
+      "employment_rate": 0.9278,
+      "degree_job_share": 0.1984
+    },
+    {
+      "name": "CHEMICAL ENGINEERING",
+      "category": "Engineering",
+      "grads": 32260,
+      "median_earnings": 65000,
+      "employment_rate": 0.9389,
+      "degree_job_share": 0.8049
+    },
+    {
+      "name": "CHEMISTRY",
+      "category": "Physical Sciences",
+      "grads": 66530,
+      "median_earnings": 39000,
+      "employment_rate": 0.946,
+      "degree_job_share": 0.6737
+    },
+    {
+      "name": "CIVIL ENGINEERING",
+      "category": "Engineering",
+      "grads": 53153,
+      "median_earnings": 50000,
+      "employment_rate": 0.9294,
+      "degree_job_share": 0.753
+    },
+    {
+      "name": "CLINICAL PSYCHOLOGY",
+      "category": "Psychology & Social Work",
+      "grads": 2838,
+      "median_earnings": 25000,
+      "employment_rate": 0.851,
+      "degree_job_share": 0.5312
+    },
+    {
+      "name": "COGNITIVE SCIENCE AND BIOPSYCHOLOGY",
+      "category": "Biology & Life Science",
+      "grads": 3831,
+      "median_earnings": 41000,
+      "employment_rate": 0.9248,
+      "degree_job_share": 0.5978
+    },
+    {
+      "name": "COMMERCIAL ART AND GRAPHIC DESIGN",
+      "category": "Arts",
+      "grads": 103480,
+      "median_earnings": 35000,
+      "employment_rate": 0.9032,
+      "degree_job_share": 0.4952
+    },
+    {
+      "name": "COMMUNICATION DISORDERS SCIENCES AND SERVICES",
+      "category": "Health",
+      "grads": 38279,
+      "median_earnings": 28000,
+      "employment_rate": 0.9524,
+      "degree_job_share": 0.6797
+    },
+    {
+      "name": "COMMUNICATION TECHNOLOGIES",
+      "category": "Computers & Mathematics",
+      "grads": 18035,
+      "median_earnings": 35000,
+      "employment_rate": 0.8805,
+      "degree_job_share": 0.3407
+    },
+    {
+      "name": "COMMUNICATIONS",
+      "category": "Communications & Journalism",
+      "grads": 213996,
+      "median_earnings": 35000,
+      "employment_rate": 0.9248,
+      "degree_job_share": 0.2938
+    },
+    {
+      "name": "COMMUNITY AND PUBLIC HEALTH",
+      "category": "Health",
+      "grads": 19735,
+      "median_earnings": 34000,
+      "employment_rate": 0.8879,
+      "degree_job_share": 0.4144
+    },
+    {
+      "name": "COMPOSITION AND RHETORIC",
+      "category": "Humanities & Liberal Arts",
+      "grads": 18953,
+      "median_earnings": 27000,
+      "employment_rate": 0.9183,
+      "degree_job_share": 0.3748
+    },
+    {
+      "name": "COMPUTER ADMINISTRATION MANAGEMENT AND SECURITY",
+      "category": "Computers & Mathematics",
+      "grads": 8066,
+      "median_earnings": 37500,
+      "employment_rate": 0.9003,
+      "degree_job_share": 0.4205
+    },
+    {
+      "name": "COMPUTER AND INFORMATION SYSTEMS",
+      "category": "Computers & Mathematics",
+      "grads": 36698,
+      "median_earnings": 45000,
+      "employment_rate": 0.9065,
+      "degree_job_share": 0.5311
+    },
+    {
+      "name": "COMPUTER ENGINEERING",
+      "category": "Engineering",
+      "grads": 41542,
+      "median_earnings": 60000,
+      "employment_rate": 0.9346,
+      "degree_job_share": 0.8055
+    },
+    {
+      "name": "COMPUTER NETWORKING AND TELECOMMUNICATIONS",
+      "category": "Computers & Mathematics",
+      "grads": 7613,
+      "median_earnings": 36400,
+      "employment_rate": 0.8482,
+      "degree_job_share": 0.4686
+    },
+    {
+      "name": "COMPUTER PROGRAMMING AND DATA PROCESSING",
+      "category": "Computers & Mathematics",
+      "grads": 4168,
+      "median_earnings": 41300,
+      "employment_rate": 0.886,
+      "degree_job_share": 0.6621
+    },
+    {
+      "name": "COMPUTER SCIENCE",
+      "category": "Computers & Mathematics",
+      "grads": 128319,
+      "median_earnings": 53000,
+      "employment_rate": 0.9368,
+      "degree_job_share": 0.7278
+    },
+    {
+      "name": "CONSTRUCTION SERVICES",
+      "category": "Industrial Arts & Consumer Services",
+      "grads": 18498,
+      "median_earnings": 50000,
+      "employment_rate": 0.94,
+      "degree_job_share": 0.3797
+    },
+    {
+      "name": "COSMETOLOGY SERVICES AND CULINARY ARTS",
+      "category": "Industrial Arts & Consumer Services",
+      "grads": 10510,
+      "median_earnings": 29000,
+      "employment_rate": 0.9443,
+      "degree_job_share": 0.0708
+    },
+    {
+      "name": "COUNSELING PSYCHOLOGY",
+      "category": "Psychology & Social Work",
+      "grads": 4626,
+      "median_earnings": 23400,
+      "employment_rate": 0.9464,
+      "degree_job_share": 0.6587
+    },
+    {
+      "name": "COURT REPORTING",
+      "category": "Law & Public Policy",
+      "grads": 1148,
+      "median_earnings": 54000,
+      "employment_rate": 0.9883,
+      "degree_job_share": 0.4323
+    },
+    {
+      "name": "CRIMINAL JUSTICE AND FIRE PROTECTION",
+      "category": "Law & Public Policy",
+      "grads": 152824,
+      "median_earnings": 35000,
+      "employment_rate": 0.9175,
+      "degree_job_share": 0.2151
+    },
+    {
+      "name": "CRIMINOLOGY",
+      "category": "Social Science",
+      "grads": 19879,
+      "median_earnings": 35000,
+      "employment_rate": 0.9028,
+      "degree_job_share": 0.2413
+    },
+    {
+      "name": "DRAMA AND THEATER ARTS",
+      "category": "Arts",
+      "grads": 43249,
+      "median_earnings": 27000,
+      "employment_rate": 0.9225,
+      "degree_job_share": 0.2165
+    },
+    {
+      "name": "EARLY CHILDHOOD EDUCATION",
+      "category": "Education",
+      "grads": 37589,
+      "median_earnings": 28000,
+      "employment_rate": 0.9599,
+      "degree_job_share": 0.7532
+    },
+    {
+      "name": "ECOLOGY",
+      "category": "Biology & Life Science",
+      "grads": 9154,
+      "median_earnings": 33000,
+      "employment_rate": 0.9455,
+      "degree_job_share": 0.4071
+    },
+    {
+      "name": "ECONOMICS",
+      "category": "Social Science",
+      "grads": 139247,
+      "median_earnings": 47000,
+      "employment_rate": 0.9009,
+      "degree_job_share": 0.4084
+    },
+    {
+      "name": "EDUCATIONAL ADMINISTRATION AND SUPERVISION",
+      "category": "Education",
+      "grads": 804,
+      "median_earnings": 34000,
+      "employment_rate": 1.0,
+      "degree_job_share": 0.6268
+    },
+    {
+      "name": "EDUCATIONAL PSYCHOLOGY",
+      "category": "Psychology & Social Work",
+      "grads": 2854,
+      "median_earnings": 25000,
+      "employment_rate": 0.9349,
+      "degree_job_share": 0.7076
+    },
+    {
+      "name": "ELECTRICAL ENGINEERING",
+      "category": "Engineering",
+      "grads": 81527,
+      "median_earnings": 60000,
+      "employment_rate": 0.9408,
+      "degree_job_share": 0.8082
+    },
+    {
+      "name": "ELECTRICAL ENGINEERING TECHNOLOGY",
+      "category": "Engineering",
+      "grads": 11565,
+      "median_earnings": 52000,
+      "employment_rate": 0.9124,
+      "degree_job_share": 0.6562
+    },
+    {
+      "name": "ELECTRICAL, MECHANICAL, AND PRECISION TECHNOLOGIES AND PRODUCTION",
+      "category": "Industrial Arts & Consumer Services",
+      "grads": 2435,
+      "median_earnings": 38400,
+      "employment_rate": 0.9705,
+      "degree_job_share": 0.1176
+    },
+    {
+      "name": "ELEMENTARY EDUCATION",
+      "category": "Education",
+      "grads": 170862,
+      "median_earnings": 32000,
+      "employment_rate": 0.9534,
+      "degree_job_share": 0.7451
+    },
+    {
+      "name": "ENGINEERING AND INDUSTRIAL MANAGEMENT",
+      "category": "Engineering",
+      "grads": 2906,
+      "median_earnings": 44000,
+      "employment_rate": 0.9663,
+      "degree_job_share": 0.3635
+    },
+    {
+      "name": "ENGINEERING MECHANICS PHYSICS AND SCIENCE",
+      "category": "Engineering",
+      "grads": 4321,
+      "median_earnings": 58000,
+      "employment_rate": 0.9937,
+      "degree_job_share": 0.7203
+    },
+    {
+      "name": "ENGINEERING TECHNOLOGIES",
+      "category": "Engineering",
+      "grads": 3600,
+      "median_earnings": 50000,
+      "employment_rate": 0.945,
+      "degree_job_share": 0.4449
+    },
+    {
+      "name": "ENGLISH LANGUAGE AND LITERATURE",
+      "category": "Humanities & Liberal Arts",
+      "grads": 194673,
+      "median_earnings": 32000,
+      "employment_rate": 0.9123,
+      "degree_job_share": 0.4454
+    },
+    {
+      "name": "ENVIRONMENTAL ENGINEERING",
+      "category": "Engineering",
+      "grads": 4047,
+      "median_earnings": 50000,
+      "employment_rate": 0.9064,
+      "degree_job_share": 0.7096
+    },
+    {
+      "name": "ENVIRONMENTAL SCIENCE",
+      "category": "Biology & Life Science",
+      "grads": 25965,
+      "median_earnings": 35600,
+      "employment_rate": 0.9214,
+      "degree_job_share": 0.4471
+    },
+    {
+      "name": "FAMILY AND CONSUMER SCIENCES",
+      "category": "Industrial Arts & Consumer Services",
+      "grads": 58001,
+      "median_earnings": 30000,
+      "employment_rate": 0.9329,
+      "degree_job_share": 0.5104
+    },
+    {
+      "name": "FILM VIDEO AND PHOTOGRAPHIC ARTS",
+      "category": "Arts",
+      "grads": 38761,
+      "median_earnings": 32000,
+      "employment_rate": 0.8942,
+      "degree_job_share": 0.2623
+    },
+    {
+      "name": "FINANCE",
+      "category": "Business",
+      "grads": 174506,
+      "median_earnings": 47000,
+      "employment_rate": 0.9393,
+      "degree_job_share": 0.3335
+    },
+    {
+      "name": "FINE ARTS",
+      "category": "Arts",
+      "grads": 74440,
+      "median_earnings": 30500,
+      "employment_rate": 0.9158,
+      "degree_job_share": 0.3885
+    },
+    {
+      "name": "FOOD SCIENCE",
+      "category": "Agriculture & Natural Resources",
+      "grads": null,
+      "median_earnings": 53000,
+      "employment_rate": 0.9031,
+      "degree_job_share": 0.4815
+    },
+    {
+      "name": "FORESTRY",
+      "category": "Agriculture & Natural Resources",
+      "grads": 3607,
+      "median_earnings": 35000,
+      "employment_rate": 0.9033,
+      "degree_job_share": 0.3931
+    },
+    {
+      "name": "FRENCH GERMAN LATIN AND OTHER COMMON FOREIGN LANGUAGE STUDIES",
+      "category": "Humanities & Liberal Arts",
+      "grads": 48246,
+      "median_earnings": 34000,
+      "employment_rate": 0.9244,
+      "degree_job_share": 0.4527
+    },
+    {
+      "name": "GENERAL AGRICULTURE",
+      "category": "Agriculture & Natural Resources",
+      "grads": 10399,
+      "median_earnings": 40000,
+      "employment_rate": 0.9804,
+      "degree_job_share": 0.3389
+    },
+    {
+      "name": "GENERAL BUSINESS",
+      "category": "Business",
+      "grads": 234590,
+      "median_earnings": 40000,
+      "employment_rate": 0.9271,
+      "degree_job_share": 0.2254
+    },
+    {
+      "name": "GENERAL EDUCATION",
+      "category": "Education",
+      "grads": 143718,
+      "median_earnings": 34000,
+      "employment_rate": 0.9426,
+      "degree_job_share": 0.725
+    },
+    {
+      "name": "GENERAL ENGINEERING",
+      "category": "Engineering",
+      "grads": 61152,
+      "median_earnings": 56000,
+      "employment_rate": 0.9402,
+      "degree_job_share": 0.6963
+    },
+    {
+      "name": "GENERAL MEDICAL AND HEALTH SERVICES",
+      "category": "Health",
+      "grads": 33599,
+      "median_earnings": 32400,
+      "employment_rate": 0.9179,
+      "degree_job_share": 0.4208
+    },
+    {
+      "name": "GENERAL SOCIAL SCIENCES",
+      "category": "Social Science",
+      "grads": 12920,
+      "median_earnings": 32000,
+      "employment_rate": 0.8965,
+      "degree_job_share": 0.4298
+    },
+    {
+      "name": "GENETICS",
+      "category": "Biology & Life Science",
+      "grads": 3635,
+      "median_earnings": 40000,
+      "employment_rate": 0.9659,
+      "degree_job_share": 0.7119
+    },
+    {
+      "name": "GEOGRAPHY",
+      "category": "Social Science",
+      "grads": 18480,
+      "median_earnings": 38000,
+      "employment_rate": 0.8865,
+      "degree_job_share": 0.4392
+    },
+    {
+      "name": "GEOLOGICAL AND GEOPHYSICAL ENGINEERING",
+      "category": "Engineering",
+      "grads": 720,
+      "median_earnings": 50000,
+      "employment_rate": 0.925,
+      "degree_job_share": 0.9093
+    },
+    {
+      "name": "GEOLOGY AND EARTH SCIENCE",
+      "category": "Physical Sciences",
+      "grads": 10972,
+      "median_earnings": 36200,
+      "employment_rate": 0.9246,
+      "degree_job_share": 0.635
+    },
+    {
+      "name": "GEOSCIENCES",
+      "category": "Physical Sciences",
+      "grads": 1978,
+      "median_earnings": 36000,
+      "employment_rate": 0.9756,
+      "degree_job_share": 0.5702
+    },
+    {
+      "name": "HEALTH AND MEDICAL ADMINISTRATIVE SERVICES",
+      "category": "Health",
+      "grads": 18109,
+      "median_earnings": 35000,
+      "employment_rate": 0.9104,
+      "degree_job_share": 0.2316
+    },
+    {
+      "name": "HEALTH AND MEDICAL PREPARATORY PROGRAMS",
+      "category": "Health",
+      "grads": 12740,
+      "median_earnings": 33500,
+      "employment_rate": 0.9302,
+      "degree_job_share": 0.463
+    },
+    {
+      "name": "HISTORY",
+      "category": "Humanities & Liberal Arts",
+      "grads": 141951,
+      "median_earnings": 34000,
+      "employment_rate": 0.9043,
+      "degree_job_share": 0.393
+    },
+    {
+      "name": "HOSPITALITY MANAGEMENT",
+      "category": "Business",
+      "grads": 43647,
+      "median_earnings": 33000,
+      "employment_rate": 0.9388,
+      "degree_job_share": 0.0906
+    },
+    {
+      "name": "HUMAN RESOURCES AND PERSONNEL MANAGEMENT",
+      "category": "Business",
+      "grads": 24497,
+      "median_earnings": 36000,
+      "employment_rate": 0.9404,
+      "degree_job_share": 0.1999
+    },
+    {
+      "name": "HUMAN SERVICES AND COMMUNITY ORGANIZATION",
+      "category": "Psychology & Social Work",
+      "grads": 9374,
+      "median_earnings": 30000,
+      "employment_rate": 0.9622,
+      "degree_job_share": 0.3851
+    },
+    {
+      "name": "HUMANITIES",
+      "category": "Humanities & Liberal Arts",
+      "grads": 6652,
+      "median_earnings": 30000,
+      "employment_rate": 0.9314,
+      "degree_job_share": 0.2583
+    },
+    {
+      "name": "INDUSTRIAL AND MANUFACTURING ENGINEERING",
+      "category": "Engineering",
+      "grads": 18968,
+      "median_earnings": 57000,
+      "employment_rate": 0.9571,
+      "degree_job_share": 0.7197
+    },
+    {
+      "name": "INDUSTRIAL AND ORGANIZATIONAL PSYCHOLOGY",
+      "category": "Psychology & Social Work",
+      "grads": 3014,
+      "median_earnings": 40000,
+      "employment_rate": 0.8912,
+      "degree_job_share": 0.3135
+    },
+    {
+      "name": "INDUSTRIAL PRODUCTION TECHNOLOGIES",
+      "category": "Engineering",
+      "grads": 4631,
+      "median_earnings": 46000,
+      "employment_rate": 0.9717,
+      "degree_job_share": 0.3623
+    },
+    {
+      "name": "INFORMATION SCIENCES",
+      "category": "Computers & Mathematics",
+      "grads": 11913,
+      "median_earnings": 45000,
+      "employment_rate": 0.9393,
+      "degree_job_share": 0.517
+    },
+    {
+      "name": "INTERCULTURAL AND INTERNATIONAL STUDIES",
+      "category": "Humanities & Liberal Arts",
+      "grads": 24650,
+      "median_earnings": 34000,
+      "employment_rate": 0.9164,
+      "degree_job_share": 0.3239
+    },
+    {
+      "name": "INTERDISCIPLINARY SOCIAL SCIENCES",
+      "category": "Social Science",
+      "grads": 9916,
+      "median_earnings": 33000,
+      "employment_rate": 0.9077,
+      "degree_job_share": 0.4024
+    },
+    {
+      "name": "INTERNATIONAL BUSINESS",
+      "category": "Business",
+      "grads": 25894,
+      "median_earnings": 40000,
+      "employment_rate": 0.9038,
+      "degree_job_share": 0.263
+    },
+    {
+      "name": "INTERNATIONAL RELATIONS",
+      "category": "Social Science",
+      "grads": 28187,
+      "median_earnings": 40100,
+      "employment_rate": 0.9032,
+      "degree_job_share": 0.4145
+    },
+    {
+      "name": "JOURNALISM",
+      "category": "Communications & Journalism",
+      "grads": 72619,
+      "median_earnings": 35000,
+      "employment_rate": 0.9308,
+      "degree_job_share": 0.466
+    },
+    {
+      "name": "LANGUAGE AND DRAMA EDUCATION",
+      "category": "Education",
+      "grads": 30471,
+      "median_earnings": 33000,
+      "employment_rate": 0.9497,
+      "degree_job_share": 0.7249
+    },
+    {
+      "name": "LIBERAL ARTS",
+      "category": "Humanities & Liberal Arts",
+      "grads": 71369,
+      "median_earnings": 32000,
+      "employment_rate": 0.9217,
+      "degree_job_share": 0.394
+    },
+    {
+      "name": "LIBRARY SCIENCE",
+      "category": "Education",
+      "grads": 1098,
+      "median_earnings": 22000,
+      "employment_rate": 0.8951,
+      "degree_job_share": 0.4601
+    },
+    {
+      "name": "LINGUISTICS AND COMPARATIVE LANGUAGE AND LITERATURE",
+      "category": "Humanities & Liberal Arts",
+      "grads": 16601,
+      "median_earnings": 33000,
+      "employment_rate": 0.8956,
+      "degree_job_share": 0.4199
+    },
+    {
+      "name": "MANAGEMENT INFORMATION SYSTEMS AND STATISTICS",
+      "category": "Business",
+      "grads": 18713,
+      "median_earnings": 51000,
+      "employment_rate": 0.9418,
+      "degree_job_share": 0.5249
+    },
+    {
+      "name": "MARKETING AND MARKETING RESEARCH",
+      "category": "Business",
+      "grads": 205211,
+      "median_earnings": 38000,
+      "employment_rate": 0.9388,
+      "degree_job_share": 0.2124
+    },
+    {
+      "name": "MASS MEDIA",
+      "category": "Communications & Journalism",
+      "grads": 52824,
+      "median_earnings": 33000,
+      "employment_rate": 0.9102,
+      "degree_job_share": 0.3369
+    },
+    {
+      "name": "MATERIALS ENGINEERING AND MATERIALS SCIENCE",
+      "category": "Engineering",
+      "grads": 2993,
+      "median_earnings": 52000,
+      "employment_rate": 0.9722,
+      "degree_job_share": 0.8624
+    },
+    {
+      "name": "MATERIALS SCIENCE",
+      "category": "Engineering",
+      "grads": 4279,
+      "median_earnings": 60000,
+      "employment_rate": 0.977,
+      "degree_job_share": 0.8704
+    },
+    {
+      "name": "MATHEMATICS",
+      "category": "Computers & Mathematics",
+      "grads": 72397,
+      "median_earnings": 45000,
+      "employment_rate": 0.9527,
+      "degree_job_share": 0.7012
+    },
+    {
+      "name": "MATHEMATICS AND COMPUTER SCIENCE",
+      "category": "Computers & Mathematics",
+      "grads": 609,
+      "median_earnings": 42000,
+      "employment_rate": 1.0,
+      "degree_job_share": 0.8709
+    },
+    {
+      "name": "MATHEMATICS TEACHER EDUCATION",
+      "category": "Education",
+      "grads": 14237,
+      "median_earnings": 34000,
+      "employment_rate": 0.9838,
+      "degree_job_share": 0.844
+    },
+    {
+      "name": "MECHANICAL ENGINEERING",
+      "category": "Engineering",
+      "grads": 91227,
+      "median_earnings": 60000,
+      "employment_rate": 0.9427,
+      "degree_job_share": 0.7633
+    },
+    {
+      "name": "MECHANICAL ENGINEERING RELATED TECHNOLOGIES",
+      "category": "Engineering",
+      "grads": 4790,
+      "median_earnings": 40000,
+      "employment_rate": 0.9436,
+      "degree_job_share": 0.4674
+    },
+    {
+      "name": "MEDICAL ASSISTING SERVICES",
+      "category": "Health",
+      "grads": 11123,
+      "median_earnings": 42000,
+      "employment_rate": 0.9575,
+      "degree_job_share": 0.2313
+    },
+    {
+      "name": "MEDICAL TECHNOLOGIES TECHNICIANS",
+      "category": "Health",
+      "grads": 15914,
+      "median_earnings": 45000,
+      "employment_rate": 0.963,
+      "degree_job_share": 0.4359
+    },
+    {
+      "name": "METALLURGICAL ENGINEERING",
+      "category": "Engineering",
+      "grads": 856,
+      "median_earnings": 73000,
+      "employment_rate": 0.9759,
+      "degree_job_share": 0.7215
+    },
+    {
+      "name": "MICROBIOLOGY",
+      "category": "Biology & Life Science",
+      "grads": 15232,
+      "median_earnings": 38000,
+      "employment_rate": 0.9332,
+      "degree_job_share": 0.6373
+    },
+    {
+      "name": "MILITARY TECHNOLOGIES",
+      "category": "Industrial Arts & Consumer Services",
+      "grads": 124,
+      "median_earnings": 40000,
+      "employment_rate": 1.0,
+      "degree_job_share": null
+    },
+    {
+      "name": "MINING AND MINERAL ENGINEERING",
+      "category": "Engineering",
+      "grads": 756,
+      "median_earnings": 75000,
+      "employment_rate": 0.8828,
+      "degree_job_share": 0.5766
+    },
+    {
+      "name": "MISCELLANEOUS AGRICULTURE",
+      "category": "Agriculture & Natural Resources",
+      "grads": 1488,
+      "median_earnings": 29000,
+      "employment_rate": 0.9402,
+      "degree_job_share": 0.4355
+    },
+    {
+      "name": "MISCELLANEOUS BIOLOGY",
+      "category": "Biology & Life Science",
+      "grads": 10706,
+      "median_earnings": 33500,
+      "employment_rate": 0.9415,
+      "degree_job_share": 0.6097
+    },
+    {
+      "name": "MISCELLANEOUS BUSINESS & MEDICAL ADMINISTRATION",
+      "category": "Business",
+      "grads": 17947,
+      "median_earnings": 40000,
+      "employment_rate": 0.928,
+      "degree_job_share": 0.2001
+    },
+    {
+      "name": "MISCELLANEOUS EDUCATION",
+      "category": "Education",
+      "grads": 10150,
+      "median_earnings": 33000,
+      "employment_rate": 0.9408,
+      "degree_job_share": 0.6843
+    },
+    {
+      "name": "MISCELLANEOUS ENGINEERING",
+      "category": "Engineering",
+      "grads": 9133,
+      "median_earnings": 50000,
+      "employment_rate": 0.9256,
+      "degree_job_share": 0.5868
+    },
+    {
+      "name": "MISCELLANEOUS ENGINEERING TECHNOLOGIES",
+      "category": "Engineering",
+      "grads": 8804,
+      "median_earnings": 40000,
+      "employment_rate": 0.9475,
+      "degree_job_share": 0.3857
+    },
+    {
+      "name": "MISCELLANEOUS FINE ARTS",
+      "category": "Arts",
+      "grads": 3340,
+      "median_earnings": 50000,
+      "employment_rate": 0.9106,
+      "degree_job_share": 0.2879
+    },
+    {
+      "name": "MISCELLANEOUS HEALTH MEDICAL PROFESSIONS",
+      "category": "Health",
+      "grads": 13386,
+      "median_earnings": 36000,
+      "employment_rate": 0.9186,
+      "degree_job_share": 0.5958
+    },
+    {
+      "name": "MISCELLANEOUS PSYCHOLOGY",
+      "category": "Psychology & Social Work",
+      "grads": 9628,
+      "median_earnings": 30000,
+      "employment_rate": 0.9481,
+      "degree_job_share": 0.4285
+    },
+    {
+      "name": "MISCELLANEOUS SOCIAL SCIENCES",
+      "category": "Social Science",
+      "grads": 3283,
+      "median_earnings": 40000,
+      "employment_rate": 0.9269,
+      "degree_job_share": 0.3103
+    },
+    {
+      "name": "MOLECULAR BIOLOGY",
+      "category": "Biology & Life Science",
+      "grads": 18300,
+      "median_earnings": 40000,
+      "employment_rate": 0.9156,
+      "degree_job_share": 0.6967
+    },
+    {
+      "name": "MULTI-DISCIPLINARY OR GENERAL SCIENCE",
+      "category": "Physical Sciences",
+      "grads": 62052,
+      "median_earnings": 35000,
+      "employment_rate": 0.9442,
+      "degree_job_share": 0.4485
+    },
+    {
+      "name": "MULTI/INTERDISCIPLINARY STUDIES",
+      "category": "Interdisciplinary",
+      "grads": 12296,
+      "median_earnings": 35000,
+      "employment_rate": 0.9291,
+      "degree_job_share": 0.5701
+    },
+    {
+      "name": "MUSIC",
+      "category": "Arts",
+      "grads": 60633,
+      "median_earnings": 31000,
+      "employment_rate": 0.924,
+      "degree_job_share": 0.3233
+    },
+    {
+      "name": "NATURAL RESOURCES MANAGEMENT",
+      "category": "Agriculture & Natural Resources",
+      "grads": 13773,
+      "median_earnings": 35000,
+      "employment_rate": 0.9334,
+      "degree_job_share": 0.4273
+    },
+    {
+      "name": "NAVAL ARCHITECTURE AND MARINE ENGINEERING",
+      "category": "Engineering",
+      "grads": 1258,
+      "median_earnings": 70000,
+      "employment_rate": 0.9499,
+      "degree_job_share": 0.8384
+    },
+    {
+      "name": "NEUROSCIENCE",
+      "category": "Biology & Life Science",
+      "grads": 13663,
+      "median_earnings": 35000,
+      "employment_rate": 0.9515,
+      "degree_job_share": 0.709
+    },
+    {
+      "name": "NUCLEAR ENGINEERING",
+      "category": "Engineering",
+      "grads": 2573,
+      "median_earnings": 65000,
+      "employment_rate": 0.8228,
+      "degree_job_share": 0.6348
+    },
+    {
+      "name": "NUCLEAR, INDUSTRIAL RADIOLOGY, AND BIOLOGICAL TECHNOLOGIES",
+      "category": "Physical Sciences",
+      "grads": 2116,
+      "median_earnings": 46000,
+      "employment_rate": 0.9285,
+      "degree_job_share": 0.099
+    },
+    {
+      "name": "NURSING",
+      "category": "Health",
+      "grads": 209394,
+      "median_earnings": 48000,
+      "employment_rate": 0.9551,
+      "degree_job_share": 0.8529
+    },
+    {
+      "name": "NUTRITION SCIENCES",
+      "category": "Health",
+      "grads": 18909,
+      "median_earnings": 35000,
+      "employment_rate": 0.9313,
+      "degree_job_share": 0.5442
+    },
+    {
+      "name": "OCEANOGRAPHY",
+      "category": "Physical Sciences",
+      "grads": 2418,
+      "median_earnings": 44700,
+      "employment_rate": 0.943,
+      "degree_job_share": 0.3155
+    },
+    {
+      "name": "OPERATIONS LOGISTICS AND E-COMMERCE",
+      "category": "Business",
+      "grads": 11732,
+      "median_earnings": 50000,
+      "employment_rate": 0.9521,
+      "degree_job_share": 0.2877
+    },
+    {
+      "name": "OTHER FOREIGN LANGUAGES",
+      "category": "Humanities & Liberal Arts",
+      "grads": 11204,
+      "median_earnings": 27500,
+      "employment_rate": 0.8929,
+      "degree_job_share": 0.3858
+    },
+    {
+      "name": "PETROLEUM ENGINEERING",
+      "category": "Engineering",
+      "grads": 2339,
+      "median_earnings": 110000,
+      "employment_rate": 0.9816,
+      "degree_job_share": 0.8082
+    },
+    {
+      "name": "PHARMACOLOGY",
+      "category": "Biology & Life Science",
+      "grads": 1762,
+      "median_earnings": 45000,
+      "employment_rate": 0.9145,
+      "degree_job_share": 0.5578
+    },
+    {
+      "name": "PHARMACY PHARMACEUTICAL SCIENCES AND ADMINISTRATION",
+      "category": "Health",
+      "grads": 23551,
+      "median_earnings": 40000,
+      "employment_rate": 0.9445,
+      "degree_job_share": 0.7203
+    },
+    {
+      "name": "PHILOSOPHY AND RELIGIOUS STUDIES",
+      "category": "Humanities & Liberal Arts",
+      "grads": 54814,
+      "median_earnings": 32200,
+      "employment_rate": 0.9039,
+      "degree_job_share": 0.4156
+    },
+    {
+      "name": "PHYSICAL AND HEALTH EDUCATION TEACHING",
+      "category": "Education",
+      "grads": 28213,
+      "median_earnings": 31000,
+      "employment_rate": 0.9253,
+      "degree_job_share": 0.578
+    },
+    {
+      "name": "PHYSICAL FITNESS PARKS RECREATION AND LEISURE",
+      "category": "Industrial Arts & Consumer Services",
+      "grads": 125074,
+      "median_earnings": 32000,
+      "employment_rate": 0.9485,
+      "degree_job_share": 0.3013
+    },
+    {
+      "name": "PHYSICAL SCIENCES",
+      "category": "Physical Sciences",
+      "grads": 1436,
+      "median_earnings": 40000,
+      "employment_rate": 0.9646,
+      "degree_job_share": 0.5327
+    },
+    {
+      "name": "PHYSICS",
+      "category": "Physical Sciences",
+      "grads": 32142,
+      "median_earnings": 45000,
+      "employment_rate": 0.9518,
+      "degree_job_share": 0.8032
+    },
+    {
+      "name": "PHYSIOLOGY",
+      "category": "Biology & Life Science",
+      "grads": 22060,
+      "median_earnings": 35000,
+      "employment_rate": 0.9308,
+      "degree_job_share": 0.4886
+    },
+    {
+      "name": "PLANT SCIENCE AND AGRONOMY",
+      "category": "Agriculture & Natural Resources",
+      "grads": 7416,
+      "median_earnings": 32000,
+      "employment_rate": 0.9545,
+      "degree_job_share": 0.3708
+    },
+    {
+      "name": "POLITICAL SCIENCE AND GOVERNMENT",
+      "category": "Social Science",
+      "grads": 182621,
+      "median_earnings": 38000,
+      "employment_rate": 0.8988,
+      "degree_job_share": 0.355
+    },
+    {
+      "name": "PRE-LAW AND LEGAL STUDIES",
+      "category": "Law & Public Policy",
+      "grads": 13528,
+      "median_earnings": 36000,
+      "employment_rate": 0.928,
+      "degree_job_share": 0.2368
+    },
+    {
+      "name": "PSYCHOLOGY",
+      "category": "Psychology & Social Work",
+      "grads": 393735,
+      "median_earnings": 31500,
+      "employment_rate": 0.9162,
+      "degree_job_share": 0.4687
+    },
+    {
+      "name": "PUBLIC ADMINISTRATION",
+      "category": "Law & Public Policy",
+      "grads": 5629,
+      "median_earnings": 36000,
+      "employment_rate": 0.8405,
+      "degree_job_share": 0.2843
+    },
+    {
+      "name": "PUBLIC POLICY",
+      "category": "Law & Public Policy",
+      "grads": 5978,
+      "median_earnings": 50000,
+      "employment_rate": 0.8716,
+      "degree_job_share": 0.4531
+    },
+    {
+      "name": "SCHOOL STUDENT COUNSELING",
+      "category": "Education",
+      "grads": 818,
+      "median_earnings": 41000,
+      "employment_rate": 0.8924,
+      "degree_job_share": 0.6973
+    },
+    {
+      "name": "SCIENCE AND COMPUTER TEACHER EDUCATION",
+      "category": "Education",
+      "grads": 6483,
+      "median_earnings": 32000,
+      "employment_rate": 0.9527,
+      "degree_job_share": 0.7921
+    },
+    {
+      "name": "SECONDARY TEACHER EDUCATION",
+      "category": "Education",
+      "grads": 17125,
+      "median_earnings": 32500,
+      "employment_rate": 0.9478,
+      "degree_job_share": 0.722
+    },
+    {
+      "name": "SOCIAL PSYCHOLOGY",
+      "category": "Psychology & Social Work",
+      "grads": 1386,
+      "median_earnings": 36000,
+      "employment_rate": 0.9704,
+      "degree_job_share": 0.4226
+    },
+    {
+      "name": "SOCIAL SCIENCE OR HISTORY TEACHER EDUCATION",
+      "category": "Education",
+      "grads": 20198,
+      "median_earnings": 34000,
+      "employment_rate": 0.9459,
+      "degree_job_share": 0.6627
+    },
+    {
+      "name": "SOCIAL WORK",
+      "category": "Psychology & Social Work",
+      "grads": 53552,
+      "median_earnings": 30000,
+      "employment_rate": 0.9312,
+      "degree_job_share": 0.6557
+    },
+    {
+      "name": "SOCIOLOGY",
+      "category": "Social Science",
+      "grads": 115433,
+      "median_earnings": 33000,
+      "employment_rate": 0.915,
+      "degree_job_share": 0.3727
+    },
+    {
+      "name": "SOIL SCIENCE",
+      "category": "Agriculture & Natural Resources",
+      "grads": 685,
+      "median_earnings": 35000,
+      "employment_rate": 1.0,
+      "degree_job_share": 0.7114
+    },
+    {
+      "name": "SPECIAL NEEDS EDUCATION",
+      "category": "Education",
+      "grads": 28739,
+      "median_earnings": 35000,
+      "employment_rate": 0.9585,
+      "degree_job_share": 0.8417
+    },
+    {
+      "name": "STATISTICS AND DECISION SCIENCE",
+      "category": "Computers & Mathematics",
+      "grads": 6251,
+      "median_earnings": 45000,
+      "employment_rate": 0.9137,
+      "degree_job_share": 0.6569
+    },
+    {
+      "name": "STUDIO ARTS",
+      "category": "Arts",
+      "grads": 16977,
+      "median_earnings": 29000,
+      "employment_rate": 0.9104,
+      "degree_job_share": 0.312
+    },
+    {
+      "name": "TEACHER EDUCATION: MULTIPLE LEVELS",
+      "category": "Education",
+      "grads": 14443,
+      "median_earnings": 30000,
+      "employment_rate": 0.9635,
+      "degree_job_share": 0.8467
+    },
+    {
+      "name": "THEOLOGY AND RELIGIOUS VOCATIONS",
+      "category": "Humanities & Liberal Arts",
+      "grads": 30207,
+      "median_earnings": 29000,
+      "employment_rate": 0.9374,
+      "degree_job_share": 0.452
+    },
+    {
+      "name": "TRANSPORTATION SCIENCES AND TECHNOLOGIES",
+      "category": "Industrial Arts & Consumer Services",
+      "grads": 15150,
+      "median_earnings": 35000,
+      "employment_rate": 0.9273,
+      "degree_job_share": 0.4267
+    },
+    {
+      "name": "TREATMENT THERAPY PROFESSIONS",
+      "category": "Health",
+      "grads": 48491,
+      "median_earnings": 33000,
+      "employment_rate": 0.9402,
+      "degree_job_share": 0.6032
+    },
+    {
+      "name": "UNITED STATES HISTORY",
+      "category": "Humanities & Liberal Arts",
+      "grads": 3079,
+      "median_earnings": 40000,
+      "employment_rate": 0.9528,
+      "degree_job_share": 0.3349
+    },
+    {
+      "name": "VISUAL AND PERFORMING ARTS",
+      "category": "Arts",
+      "grads": 16250,
+      "median_earnings": 30000,
+      "employment_rate": 0.8978,
+      "degree_job_share": 0.3352
+    },
+    {
+      "name": "ZOOLOGY",
+      "category": "Biology & Life Science",
+      "grads": 8409,
+      "median_earnings": 26000,
+      "employment_rate": 0.9537,
+      "degree_job_share": 0.4846
+    }
+  ]
+}
